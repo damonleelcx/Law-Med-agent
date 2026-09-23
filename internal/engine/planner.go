@@ -19,13 +19,13 @@ import (
 // PlannedTask is the planner's contract with the model. Everything the model
 // proposes is validated against it before a single row is written.
 type PlannedTask struct {
-	Key          string   `json:"key"`
-	Title        string   `json:"title"`
-	Instructions string   `json:"instructions"`
-	Tools        strList  `json:"tools"`
-	Deps         strList  `json:"deps"`
-	Verify       strList  `json:"verify"`
-	WaitDays     flexNum  `json:"wait_days"`
+	Key          string  `json:"key"`
+	Title        string  `json:"title"`
+	Instructions string  `json:"instructions"`
+	Tools        strList `json:"tools"`
+	Deps         strList `json:"deps"`
+	Verify       strList `json:"verify"`
+	WaitDays     flexNum `json:"wait_days"`
 }
 
 // strList accepts ["a","b"], "a", "a, b" or null — models are inconsistent

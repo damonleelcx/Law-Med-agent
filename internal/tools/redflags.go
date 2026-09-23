@@ -40,8 +40,9 @@ func CheckRedFlags(text string) []RedFlag {
 	return out
 }
 
-// EmergencyText is shown verbatim, before anything a model writes.
-func EmergencyText(flags []RedFlag, lang string) string {
+// EmergencyText is shown verbatim, before anything a model writes. It says a
+// clinician was alerted only when the page was actually delivered.
+func EmergencyText(flags []RedFlag, lang string, paged bool) string {
 	crisis := false
 	for _, f := range flags {
 		if f.Category == "crisis" {
@@ -52,10 +53,18 @@ func EmergencyText(flags []RedFlag, lang string) string {
 		if crisis {
 			return "**你的安全最重要。** 如果你有伤害自己的想法或正处于危险中，请立即拨打 **120 / 110**（中国大陆）或 **911**（美国），美国也可拨打或发短信至 **988** 自杀与危机求助热线。我会一直在这里陪你，但现在请先联系能马上到你身边的人。"
 		}
-		return "**这听起来可能是紧急情况。** 请立即拨打 **120**（中国大陆）或 **911**（美国），或前往最近的急诊室。不要自行开车。我已通知值班临床医生。在等待救援时，我可以陪你一步步做。"
+		t := "**这听起来可能是紧急情况。** 请立即拨打 **120**（中国大陆）或 **911**（美国），或前往最近的急诊室。不要自行开车。"
+		if paged {
+			t += "我已通知值班临床医生。"
+		}
+		return t + "在等待救援时，我可以陪你一步步做。"
 	}
 	if crisis {
 		return "**Your safety matters most right now.** If you are thinking about hurting yourself or are in danger, call or text **988** (Suicide & Crisis Lifeline, US) or call **911**. Outside the US, call your local emergency number. I'm here with you, but please reach someone who can be with you now."
 	}
-	return "**This may be a medical emergency.** Call **911** (or your local emergency number) now, or go to the nearest emergency department. Don't drive yourself. I've alerted the on-call clinician. I can stay with you while you wait."
+	t := "**This may be a medical emergency.** Call **911** (or your local emergency number) now, or go to the nearest emergency department. Don't drive yourself. "
+	if paged {
+		t += "I've alerted the on-call clinician. "
+	}
+	return t + "I can stay with you while you wait."
 }

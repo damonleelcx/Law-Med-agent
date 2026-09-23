@@ -111,14 +111,24 @@ func (a *Agent) Turn(ctx context.Context, u User, convID, text, clientMsgID stri
 		for i, f := range flags {
 			codes[i] = f.Code
 		}
-		preface = tools.EmergencyText(flags, lang) + "\n\n"
+		// Guidance goes out before anything else, including the page: a slow
+		// relay must never delay "call 911". Whether a clinician was alerted is
+		// said only after the page was actually delivered.
+		preface = tools.EmergencyText(flags, lang, false) + "\n\n"
 		sink.Meta(map[string]any{"intent": "med.emergency", "flags": codes, "expression": "concerned"})
 		sink.Delta(preface)
-		env := &tools.Env{Pool: a.Store.Pool, Mailer: a.Mailer, UserID: u.ID, UserEmail: u.Email, UserName: u.Name,
-			OnCallEmail: a.OnCallEmail, Scope: fmt.Sprint(userMsgID)}
-		args, _ := json.Marshal(map[string]any{"summary": truncate(text, 1500), "flags": codes})
-		if _, err := tools.Invoke(ctx, env, "escalate_emergency", args, false); err != nil {
-			slog.Error("escalate", "err", err)
+		if a.OnCallEmail != "" {
+			env := &tools.Env{Pool: a.Store.Pool, Mailer: a.Mailer, UserID: u.ID, UserEmail: u.Email, UserName: u.Name,
+				OnCallEmail: a.OnCallEmail, Scope: fmt.Sprint(userMsgID)}
+			args, _ := json.Marshal(map[string]any{"summary": truncate(text, 1500), "flags": codes})
+			res, err := tools.Invoke(ctx, env, "escalate_emergency", args, false)
+			if err != nil {
+				slog.Error("escalate", "err", err)
+			} else if res.Output["paged"] == true {
+				note := map[string]string{"en": "_I've alerted the ACT on-call clinician._\n\n", "zh": "_我已通知 ACT 值班临床医生。_\n\n"}[lang]
+				preface += note
+				sink.Delta(note)
+			}
 		}
 		a.Store.Event(ctx, u.ID, "", "", "emergency", map[string]any{"flags": codes, "why": "red-flag rules matched the client's message"})
 		meta["intent"], meta["flags"] = "med.emergency", codes
