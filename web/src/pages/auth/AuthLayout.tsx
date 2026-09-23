@@ -20,7 +20,10 @@ export default function AuthLayout({ title, sub, children, mood = 'smile' }: { t
           {sub && <p className="auth-sub">{sub}</p>}
           {children}
         </div>
-        <p className="auth-foot">{t.footer.disclaimer}</p>
+        <p className="auth-foot">
+          {t.footer.disclaimer}{' '}
+          <Link to="/privacy">{t.footer.links[0]}</Link> · <Link to="/terms">{t.footer.links[1]}</Link>
+        </p>
       </section>
       <aside className="auth-visual" aria-hidden="true">
         <div className="auth-arch" />

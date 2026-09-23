@@ -34,6 +34,7 @@ Timeline ◄── Checkpoint ◄── Verification ◄── Tools (typed, gat
 | Chat UI: streaming, live case cards, inline approvals, uploads, Vera's moods | `web/src/app/Chat.tsx` |
 | 5-section landing page with the 3D erosion sphere and full-body Vera | `web/src/pages/Landing.tsx`, `web/src/components/ErosionSphere.tsx` |
 | Settings: profile, Vera & language, notifications, privacy & memory, security, limits & usage, professional licence, appearance, admin | `web/src/app/Settings.tsx` |
+| Terms of Service and Privacy Policy (English / 中文) | `/terms`, `/privacy`, `web/src/pages/legal/content.ts` |
 | Bilingual (English / 中文) across the site, emails and Vera's replies | `web/src/lib/i18n.tsx`, `internal/auth` mail templates |
 | Docker + k8s on the heros-prod k3s node | `Dockerfile`, `deploy/` |
 
@@ -61,6 +62,7 @@ Timeline ◄── Checkpoint ◄── Verification ◄── Tools (typed, gat
 | Prevent infinite execution | per-goal limits on iterations, tool calls, tokens, estimated cost, days, DAG depth, tasks per plan, total tasks and replans; per-account and deployment daily token caps; a per-task step budget with forced wrap-up. Tested: `TestBudgetStopsTheGoal` |
 | Separate memory types | task state (`tasks`/`checkpoints`), episodic (`events` + `episode_summaries`), knowledge (`documents` + `knowledge_chunks`), preferences (`user_preferences`), facts (`memories`, visible and deletable in Settings) |
 | Summarise history | the scheduler folds old events into episode summaries once a goal passes 60 events. The last 20 always stay raw |
+| Notification email | a **transactional outbox**: an approval's email is written in the same transaction as the approval, then delivered by the scheduler with retries (30s → 16m, 6 attempts). Stale requests are skipped. Emails carry no case content. Tested: `TestApprovalEmail*` |
 | Human approval gates | G1 client, G2 licensed professional with a **verified** licence, G3 never automated (controlled substances, appearing as counsel). The exact call is stored and replayed on approval; declined calls are fed back to the model. Tested: `TestRejectedApprovalIsReportedNotExecuted`, `TestControlledSubstanceIsNeverAutomated` |
 | Observability & timeline | `events` (append-only, with *why*), `tool_calls`, `llm_calls` (tokens, latency, errors), goal usage. The case page answers what happened, why, when, and what happens next |
 | Evaluation scenarios & recovery tests | `internal/engine/engine_test.go`: 14 scenarios against real Postgres (concurrency, fencing, crash/resume, duplicates, approvals, G3, DAG timers, budget, cancel, verifier, plan validation, idempotent scheduling, one-time reminders, planner fallback) |

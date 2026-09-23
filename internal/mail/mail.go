@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"fmt"
+	"html"
 	"log/slog"
 	"mime"
 	"net"
@@ -175,4 +176,21 @@ func (Log) Enabled() bool { return false }
 func (Log) Send(_ context.Context, m Message) (string, error) {
 	slog.Info("MAIL (not sent — relay not configured)", "to", m.To, "subject", m.Subject, "body", m.Text)
 	return "log-" + m.MessageID, nil
+}
+
+// Page is the branded HTML frame every ACT email uses: title, lead paragraph,
+// one call-to-action button, the link spelled out, and a footnote.
+func Page(title, lead, cta, link, foot string) string {
+	e := html.EscapeString
+	return `<!doctype html><html><body style="margin:0;background:#f4ede1;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1d1b18">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 16px">
+<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fffaf2;border-radius:20px;padding:36px">
+<tr><td style="font-size:13px;letter-spacing:.2em;font-weight:700;color:#e8662a">ACT</td></tr>
+<tr><td style="padding-top:18px;font-size:26px;font-weight:700;line-height:1.2">` + e(title) + `</td></tr>
+<tr><td style="padding-top:14px;font-size:15px;line-height:1.6;color:#4a453e">` + e(lead) + `</td></tr>
+<tr><td style="padding-top:26px"><a href="` + e(link) + `" style="display:inline-block;background:#1d1b18;color:#fffaf2;text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:600">` + e(cta) + `</a></td></tr>
+<tr><td style="padding-top:22px;font-size:12px;line-height:1.6;color:#8a8278;word-break:break-all">` + e(link) + `</td></tr>
+<tr><td style="padding-top:18px;font-size:13px;line-height:1.6;color:#8a8278">` + e(foot) + `</td></tr>
+<tr><td style="padding-top:26px;font-size:13px;color:#4a453e">— Vera · ACT</td></tr>
+</table></td></tr></table></body></html>`
 }

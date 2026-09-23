@@ -37,7 +37,12 @@ export default function SignUp() {
           <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
         </label>
         <PasswordInput label={t.auth.password} value={password} onChange={setPassword} autoComplete="new-password" showMeter />
-        <p className="auth-fine">{t.auth.agree}</p>
+        <p className="auth-fine">
+          {t.auth.agree.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
+            part === '{terms}' ? <Link key={i} to="/terms" target="_blank">{t.auth.termsLink}</Link>
+            : part === '{privacy}' ? <Link key={i} to="/privacy" target="_blank">{t.auth.privacyLink}</Link>
+            : part)}
+        </p>
         <button className="btn btn-ink btn-lg auth-submit" disabled={busy || [...password].length < 10}>{busy ? t.common.loading : t.auth.signup}</button>
       </form>
       <p className="auth-switch">{t.auth.haveAccount} <Link to="/signin">{t.auth.signin}</Link></p>

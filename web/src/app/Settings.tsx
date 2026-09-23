@@ -213,7 +213,7 @@ function Privacy({ prefs, save }: { prefs: Record<string, any>; save: (p: { pref
         {mem.length > 0 && <button className="btn btn-danger btn-sm" onClick={() => forget()}>{t.settings.forgetAll}</button>}
       </Card>
       <Card title={t.settings.export}>
-        <p className="muted">{t.settings.exportHint}</p>
+        <p className="muted">{t.settings.exportHint} <a href="/privacy" target="_blank" rel="noopener">{t.settings.policy}</a></p>
         <a className="btn btn-soft btn-sm" href="/api/account/export" download>{t.settings.export}</a>
       </Card>
       <Card title={t.settings.deleteAccount} danger>

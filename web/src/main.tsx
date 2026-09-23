@@ -15,6 +15,7 @@ const Verify = lazy(() => import('./pages/auth/Verify'))
 const Forgot = lazy(() => import('./pages/auth/Forgot'))
 const Reset = lazy(() => import('./pages/auth/Reset'))
 const AppShell = lazy(() => import('./app/AppShell'))
+const Legal = lazy(() => import('./pages/legal/Legal'))
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { user, loading } = useSession()
@@ -35,6 +36,8 @@ function App() {
         <Route path="/verify-email" element={<Verify />} />
         <Route path="/forgot-password" element={<Forgot />} />
         <Route path="/reset-password" element={<Reset />} />
+        <Route path="/terms" element={<Legal kind="terms" />} />
+        <Route path="/privacy" element={<Legal kind="privacy" />} />
         <Route path="/app/*" element={<RequireAuth><AppShell /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

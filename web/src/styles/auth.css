@@ -50,3 +50,5 @@
   .auth-visual { display: none; }
   .auth-card { padding: 28px 0; }
 }
+.auth-fine a, .auth-foot a { color: var(--ember-600); font-weight: 600; text-decoration: none; }
+.auth-fine a:hover, .auth-foot a:hover { text-decoration: underline; }

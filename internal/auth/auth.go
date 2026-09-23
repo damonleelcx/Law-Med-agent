@@ -12,7 +12,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"html"
 	"net/mail"
 	"strings"
 	"time"
@@ -405,22 +404,22 @@ func verifyMail(lang, name, link string) mailer.Message {
 	if lang == "zh" {
 		return mailer.Message{Subject: "请验证你的邮箱 · ACT",
 			Text: fmt.Sprintf("%s你好，\n\n欢迎来到 ACT。请点击下面的链接验证邮箱（48 小时内有效）：\n\n%s\n\n如果不是你本人注册，请忽略此邮件。\n\n—— 维拉，ACT", greetName(name), link),
-			HTML: page("验证你的邮箱", greetName(name)+"你好，欢迎来到 ACT。我是维拉，会和持证律师、医生一起照看你的事情。先确认一下这是你的邮箱：", "验证邮箱", link, "链接 48 小时内有效。如果不是你本人注册，请忽略此邮件。")}
+			HTML: mailer.Page("验证你的邮箱", greetName(name)+"你好，欢迎来到 ACT。我是维拉，会和持证律师、医生一起照看你的事情。先确认一下这是你的邮箱：", "验证邮箱", link, "链接 48 小时内有效。如果不是你本人注册，请忽略此邮件。")}
 	}
 	return mailer.Message{Subject: "Confirm your email · ACT",
 		Text: fmt.Sprintf("Hi %s,\n\nWelcome to ACT. Confirm your email address with this link (valid for 48 hours):\n\n%s\n\nIf you didn't sign up, you can ignore this message.\n\n— Vera, ACT", orThere(name), link),
-		HTML: page("Confirm your email", "Hi "+orThere(name)+", welcome to ACT. I'm Vera — I'll look after your matters together with our licensed attorneys and physicians. First, let's confirm this is your email:", "Confirm email", link, "This link is valid for 48 hours. If you didn't sign up, you can ignore this message.")}
+		HTML: mailer.Page("Confirm your email", "Hi "+orThere(name)+", welcome to ACT. I'm Vera — I'll look after your matters together with our licensed attorneys and physicians. First, let's confirm this is your email:", "Confirm email", link, "This link is valid for 48 hours. If you didn't sign up, you can ignore this message.")}
 }
 
 func resetMail(lang, name, link string) mailer.Message {
 	if lang == "zh" {
 		return mailer.Message{Subject: "重置你的 ACT 密码",
 			Text: fmt.Sprintf("%s你好，\n\n我们收到了重置密码的请求。点击下面的链接设置新密码（1 小时内有效）：\n\n%s\n\n如果不是你本人操作，请忽略此邮件，你的密码不会改变。\n\n—— 维拉，ACT", greetName(name), link),
-			HTML: page("重置密码", greetName(name)+"你好，我们收到了重置密码的请求。", "设置新密码", link, "链接 1 小时内有效，且只能使用一次。如果不是你本人操作，请忽略此邮件，你的密码不会改变。")}
+			HTML: mailer.Page("重置密码", greetName(name)+"你好，我们收到了重置密码的请求。", "设置新密码", link, "链接 1 小时内有效，且只能使用一次。如果不是你本人操作，请忽略此邮件，你的密码不会改变。")}
 	}
 	return mailer.Message{Subject: "Reset your ACT password",
 		Text: fmt.Sprintf("Hi %s,\n\nWe received a request to reset your password. Set a new one with this link (valid for 1 hour):\n\n%s\n\nIf you didn't ask for this, ignore this message — your password won't change.\n\n— Vera, ACT", orThere(name), link),
-		HTML: page("Reset your password", "Hi "+orThere(name)+", we received a request to reset your password.", "Set a new password", link, "This link is valid for 1 hour and works once. If you didn't ask for this, ignore this message — your password won't change.")}
+		HTML: mailer.Page("Reset your password", "Hi "+orThere(name)+", we received a request to reset your password.", "Set a new password", link, "This link is valid for 1 hour and works once. If you didn't ask for this, ignore this message — your password won't change.")}
 }
 
 func orThere(n string) string {
@@ -435,21 +434,6 @@ func greetName(n string) string {
 		return ""
 	}
 	return n
-}
-
-func page(title, lead, cta, link, foot string) string {
-	e := html.EscapeString
-	return `<!doctype html><html><body style="margin:0;background:#f4ede1;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1d1b18">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 16px">
-<table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fffaf2;border-radius:20px;padding:36px">
-<tr><td style="font-size:13px;letter-spacing:.2em;font-weight:700;color:#e8662a">ACT</td></tr>
-<tr><td style="padding-top:18px;font-size:26px;font-weight:700;line-height:1.2">` + e(title) + `</td></tr>
-<tr><td style="padding-top:14px;font-size:15px;line-height:1.6;color:#4a453e">` + e(lead) + `</td></tr>
-<tr><td style="padding-top:26px"><a href="` + e(link) + `" style="display:inline-block;background:#1d1b18;color:#fffaf2;text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:600">` + e(cta) + `</a></td></tr>
-<tr><td style="padding-top:22px;font-size:12px;line-height:1.6;color:#8a8278;word-break:break-all">` + e(link) + `</td></tr>
-<tr><td style="padding-top:18px;font-size:13px;line-height:1.6;color:#8a8278">` + e(foot) + `</td></tr>
-<tr><td style="padding-top:26px;font-size:13px;color:#4a453e">— Vera · ACT</td></tr>
-</table></td></tr></table></body></html>`
 }
 
 func truncate(s string, n int) string {

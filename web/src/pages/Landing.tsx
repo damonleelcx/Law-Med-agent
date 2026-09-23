@@ -310,6 +310,11 @@ export default function Landing() {
             <small>{t.brand.expand}</small>
           </div>
           <p className="f-disclaimer">{t.footer.disclaimer}</p>
+          <nav className="f-links" aria-label="Legal">
+            <Link to="/privacy">{t.footer.links[0]}</Link>
+            <Link to="/terms">{t.footer.links[1]}</Link>
+            <a href="mailto:support@heros-agent.space">{t.footer.links[2]}</a>
+          </nav>
           <div className="f-bottom">
             <span>{t.footer.rights}</span>
             <LangSwitch />

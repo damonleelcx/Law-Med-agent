@@ -12,6 +12,7 @@ import (
 
 	"github.com/damonleelcx/Law-Med-agent/internal/llm"
 	"github.com/damonleelcx/Law-Med-agent/internal/mail"
+	"github.com/damonleelcx/Law-Med-agent/internal/notify"
 )
 
 // Scheduler is the wake-up machinery. Exactly one runs at a time across all
@@ -139,6 +140,7 @@ func (s *Scheduler) Tick(ctx context.Context) {
 	}
 
 	s.deliverReminders(ctx)
+	notify.Deliver(ctx, s.Store.Pool, s.Mailer, s.PublicOrigin)
 }
 
 // SlowTick: reviews, time limits, compaction, stale approvals.

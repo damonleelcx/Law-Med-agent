@@ -39,7 +39,7 @@ func testPool(t *testing.T) *pgxpool.Pool {
 		t.Fatal(err)
 	}
 	_, err = pool.Exec(ctx, `TRUNCATE users, goals, tasks, task_deps, checkpoints, tool_calls, approvals, events, episode_summaries,
-		documents, knowledge_chunks, llm_calls, reminders, conversations, messages, memories, user_preferences, sessions, email_tokens, professional_licenses CASCADE`)
+		documents, knowledge_chunks, llm_calls, reminders, conversations, messages, memories, user_preferences, sessions, email_tokens, professional_licenses, outbox CASCADE`)
 	if err != nil {
 		t.Fatal(err)
 	}

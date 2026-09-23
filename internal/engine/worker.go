@@ -16,6 +16,7 @@ import (
 
 	"github.com/damonleelcx/Law-Med-agent/internal/llm"
 	"github.com/damonleelcx/Law-Med-agent/internal/mail"
+	"github.com/damonleelcx/Law-Med-agent/internal/notify"
 	"github.com/damonleelcx/Law-Med-agent/internal/persona"
 	"github.com/damonleelcx/Law-Med-agent/internal/tools"
 )
@@ -543,6 +544,10 @@ func (s *Store) RequestApproval(ctx context.Context, g *Goal, t *Task, cp *Check
 		if err := s.Park(ctx, tx, t); err != nil {
 			return err
 		}
+		// Same transaction: the email exists if and only if the approval does.
+		if _, err := notify.ApprovalRequested(ctx, tx, id); err != nil {
+			return err
+		}
 		return eventTx(ctx, tx, g.UserID, g.ID, t.ID, "approval.requested", map[string]any{"task": t.Title, "tool": pc.Tool,
 			"gate": need.Gate, "role": need.Role, "why": "this action needs " + map[bool]string{true: "a licensed " + need.Role + "'s", false: "the client's"}[need.Gate == tools.G2] + " approval"})
 	})
@@ -574,6 +579,9 @@ func (s *Store) Decide(ctx context.Context, approvalID, deciderID string, approv
 			return err
 		}
 		_, _ = tx.Exec(ctx, `SELECT pg_notify('act_work', $1)`, goalID)
+		if _, err := notify.ApprovalDecided(ctx, tx, approvalID); err != nil {
+			return err
+		}
 		return eventTx(ctx, tx, userID, goalID, taskID, "approval.decided", map[string]any{"tool": tool, "decision": status, "note": note, "by": deciderID})
 	})
 }
