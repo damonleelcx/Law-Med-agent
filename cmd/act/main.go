@@ -3,7 +3,8 @@
 //	act serve    web + workers + scheduler in one process (development)
 //	act web      web tier only
 //	act worker   workers + scheduler only
-//	act migrate  apply migrations and exit
+//	act migrate    apply migrations and exit
+//	act mailcheck  prove the mail relay accepts our login, send nothing
 package main
 
 import (
@@ -62,6 +63,17 @@ func run(mode string) error {
 		return nil
 	}
 
+	if mode == "mailcheck" {
+		if !cfg.MailEnabled() {
+			return fmt.Errorf("mail is not configured")
+		}
+		m := &mail.SMTP{Host: cfg.SMTPHost, Port: cfg.SMTPPort, User: cfg.SMTPUser, Pass: cfg.SMTPPass, From: cfg.SMTPFrom}
+		if err := m.Check(ctx); err != nil {
+			return err
+		}
+		slog.Info("mailcheck ok: connected, STARTTLS certificate verified, authenticated; nothing sent", "host", cfg.SMTPHost, "from", cfg.SMTPFrom)
+		return nil
+	}
 	var mailer mail.Mailer = mail.Log{}
 	if cfg.MailEnabled() {
 		mailer = &mail.SMTP{Host: cfg.SMTPHost, Port: cfg.SMTPPort, User: cfg.SMTPUser, Pass: cfg.SMTPPass, From: cfg.SMTPFrom, ReplyTo: cfg.SMTPReplyTo}

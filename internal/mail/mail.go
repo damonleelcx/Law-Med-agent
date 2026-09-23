@@ -142,6 +142,30 @@ func crlf(s string) string {
 	return strings.Join(lines, "\r\n")
 }
 
+// Check proves the relay path end to end — TCP, STARTTLS with certificate
+// verification, AUTH — and quits without sending anything.
+func (s *SMTP) Check(ctx context.Context) error {
+	d := net.Dialer{Timeout: 15 * time.Second}
+	conn, err := d.DialContext(ctx, "tcp", fmt.Sprintf("%s:%d", s.Host, s.Port))
+	if err != nil {
+		return fmt.Errorf("dial: %w", err)
+	}
+	_ = conn.SetDeadline(time.Now().Add(30 * time.Second))
+	c, err := smtp.NewClient(conn, s.Host)
+	if err != nil {
+		conn.Close()
+		return fmt.Errorf("greeting: %w", err)
+	}
+	defer c.Close()
+	if err := c.StartTLS(&tls.Config{ServerName: s.Host, MinVersion: tls.VersionTLS12}); err != nil {
+		return fmt.Errorf("starttls: %w", err)
+	}
+	if err := c.Auth(smtp.PlainAuth("", s.User, s.Pass, s.Host)); err != nil {
+		return fmt.Errorf("auth: %w", err)
+	}
+	return c.Quit()
+}
+
 // Log is the development mailer: it prints the message, links included, so a
 // developer can click through verification without a relay.
 type Log struct{}

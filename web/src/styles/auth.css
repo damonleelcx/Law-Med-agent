@@ -37,7 +37,7 @@
 .auth-visual { position: relative; overflow: hidden; margin: 14px; border-radius: 30px;
   background: radial-gradient(60% 50% at 50% 38%, #fff7ea, rgba(255,247,234,0) 70%), linear-gradient(160deg, #eee2cd, #dcc6a3); display: grid; place-items: end center; }
 .auth-arch { position: absolute; width: 70%; aspect-ratio: .62; bottom: 0; border-radius: 999px 999px 0 0; background: rgba(255, 250, 243, .5); border: 1px solid rgba(255,255,255,.7); }
-.auth-vera { position: relative; height: 88%; width: auto; filter: drop-shadow(0 30px 40px rgba(60,40,20,.22)); animation: float 7s ease-in-out infinite; }
+.auth-vera { position: relative; height: 74%; margin-bottom: 120px; width: auto; filter: drop-shadow(0 30px 40px rgba(60,40,20,.22)); animation: float 7s ease-in-out infinite; }
 @keyframes float { 50% { transform: translateY(-10px); } }
 .auth-quote { position: absolute; left: 28px; right: 28px; bottom: 28px; padding: 18px 22px; border-radius: 20px; display: grid; gap: 4px;
   background: rgba(255, 250, 243, .7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.6); }
