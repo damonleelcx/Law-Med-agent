@@ -22,8 +22,8 @@ import (
 // These tests run against a real Postgres, because the properties under test
 // — SKIP LOCKED, fencing, transactional checkpoints — only exist there.
 //
-//	docker run -d --name act-pg -e POSTGRES_USER=act -e POSTGRES_PASSWORD=act_dev_pw -e POSTGRES_DB=act -p 127.0.0.1:55850:5432 postgres:17
-//	ACT_TEST_DATABASE_URL=postgres://act:act_dev_pw@127.0.0.1:55850/act?sslmode=disable go test ./internal/engine/
+//	docker run -d --name act-pg -e POSTGRES_USER=act -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=act -p 127.0.0.1:55850:5432 postgres:17
+//	ACT_TEST_DATABASE_URL=postgres://act@127.0.0.1:55850/act?sslmode=disable go test ./internal/engine/
 func testPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 	url := os.Getenv("ACT_TEST_DATABASE_URL")
