@@ -452,11 +452,28 @@ func (s *Server) goal(w http.ResponseWriter, r *http.Request, u *auth.User) {
 		return
 	}
 	ts, _ := s.Store.Tasks(r.Context(), g.ID)
+	// Latest meaningful event per task: what it is doing right now, or that it
+	// is being recovered after an interruption.
+	activity := map[string]map[string]any{}
+	arows, err := s.Pool.Query(r.Context(), `SELECT DISTINCT ON (task_id) task_id::text, type, coalesce(data->>'tool',''), created_at
+		FROM events WHERE goal_id=$1 AND task_id IS NOT NULL
+		AND type IN ('task.started','task.resumed','tool.called','task.verify_failed','lease.reclaimed','task.lease_lost','task.retry','approval.requested')
+		ORDER BY task_id, id DESC`, g.ID)
+	if err == nil {
+		for arows.Next() {
+			var tid, typ, tool string
+			var at time.Time
+			if arows.Scan(&tid, &typ, &tool, &at) == nil {
+				activity[tid] = map[string]any{"type": typ, "tool": tool, "at": at}
+			}
+		}
+		arows.Close()
+	}
 	tasks := []map[string]any{}
 	for _, t := range ts {
 		tasks = append(tasks, map[string]any{"id": t.ID, "key": t.Key, "title": t.Title, "kind": t.Kind, "status": t.Status,
 			"attempts": t.Attempts, "deps": t.Deps, "error": t.Error, "run_after": t.RunAfter, "started_at": t.StartedAt,
-			"finished_at": t.FinishedAt, "summary": outputSummary(t.Output), "mode": t.Spec.Mode})
+			"finished_at": t.FinishedAt, "summary": outputSummary(t.Output), "mode": t.Spec.Mode, "activity": activity[t.ID]})
 	}
 	docs := []map[string]any{}
 	rows, err := s.Pool.Query(r.Context(), `SELECT id, title, kind, version, created_at FROM documents WHERE goal_id=$1 ORDER BY created_at DESC`, g.ID)

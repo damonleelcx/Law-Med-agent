@@ -5,7 +5,7 @@ import { api, type Goal, type TimelineEvent } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { md } from '../lib/md'
 import { useLive } from './live'
-import { ApprovalCard, StatusPill, TaskIcon, fmtTime, workTasks } from './parts'
+import { Activity, ApprovalCard, StatusPill, TaskIcon, fmtTime, workTasks } from './parts'
 
 type Timeline = {
   events: TimelineEvent[]
@@ -80,6 +80,7 @@ export default function CaseView() {
                   <TaskIcon status={x.status} />
                   <div>
                     <div className="plan-row"><strong>{x.title}</strong><em>{t.goal.task[x.status as keyof typeof t.goal.task]}</em></div>
+                    <Activity task={x} />
                     {x.summary && <details className="plan-sum"><summary>{plain(x.summary).slice(0, 160)}{plain(x.summary).length > 160 ? '…' : ''}</summary><div className="prose" dangerouslySetInnerHTML={{ __html: md(x.summary) }} /></details>}
                     {x.error && x.status !== 'succeeded' && <p className="plan-err">{x.error}</p>}
                     {x.kind === 'wait' && x.status === 'ready' && <p className="muted">⏰ {fmtTime(x.run_after, lang)}</p>}

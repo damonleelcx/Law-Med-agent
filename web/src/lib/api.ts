@@ -83,6 +83,7 @@ export type Task = {
   finished_at?: string
   summary: string
   mode?: string
+  activity?: { type: string; tool: string; at: string } | null
 }
 
 export type Approval = {

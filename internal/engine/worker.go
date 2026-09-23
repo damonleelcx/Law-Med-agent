@@ -153,8 +153,11 @@ func (w *Worker) settle(ctx, parent context.Context, g *Goal, t *Task, out map[s
 	switch {
 	case err == nil:
 		if out != nil || t.Kind != "llm" {
-			w.Store.Event(ctx, g.UserID, g.ID, t.ID, "task.succeeded", map[string]any{"task": t.Title, "ms": took.Milliseconds(),
-				"summary": truncate(fmt.Sprint(out["summary"]), 300)})
+			data := map[string]any{"task": t.Title, "ms": took.Milliseconds()}
+			if sm, ok := out["summary"].(string); ok && sm != "" {
+				data["summary"] = truncate(sm, 300)
+			}
+			w.Store.Event(ctx, g.UserID, g.ID, t.ID, "task.succeeded", data)
 		}
 	case errors.As(err, &parked):
 		// Already persisted; nothing to settle.
@@ -403,7 +406,9 @@ func (w *Worker) verifyStep(ctx context.Context, t *Task) []string {
 			var n int
 			_ = w.Store.Pool.QueryRow(ctx, `SELECT count(*) FROM documents WHERE task_id=$1`, t.ID).Scan(&n)
 			if n == 0 {
-				problems = append(problems, "no document was saved with save_document")
+				problems = append(problems, "no document was saved. Call save_document NOW with this task's deliverable. "+
+					"If facts are missing, still save it: write what is known, and list what is missing under a clear heading — "+
+					"memory_save and notify_user do not count as saving the document")
 			}
 		case "citations_verified":
 			if bad := w.unverifiedCitations(ctx, t.ID); len(bad) > 0 {

@@ -279,6 +279,7 @@ Return JSON: {"intent","confidence":0-1,"domain":"legal|medical|medlegal|general
 		return Route{Intent: "smalltalk", Confidence: 1}
 	}
 	r.Language = persona.Normalize(r.Language)
+	slog.Info("route", "intent", r.Intent, "confidence", r.Confidence, "goal_id", r.GoalID, "title", r.Title)
 	return r
 }
 
@@ -446,7 +447,7 @@ func (a *Agent) afterTurn(ctx context.Context, u User, convID, text string, r Ro
 	}
 	resp, err := a.Model.Chat(ctx, engine.CallMeta{Purpose: "memory", UserID: u.ID}, llm.Request{Model: a.FastLLM, JSON: true, Temperature: 0,
 		Messages: []llm.Message{{Role: "user", Content: `Extract durable facts about the client worth remembering across future cases (location/jurisdiction, allergies, chronic conditions, current medications, employer, family situation, communication preferences). ` +
-			`Not transient details of one request. Return {"facts": ["..."]} (max 3, each under 20 words, in the message's language), or {"facts": []}.` + "\n\nMESSAGE: " + text}}})
+			`Not transient details of one request. Reply with JSON only: {"facts": ["..."]} (max 3, each under 20 words, in the message's language), or {"facts": []}.` + "\n\nMESSAGE: " + text}}})
 	if err != nil {
 		return
 	}

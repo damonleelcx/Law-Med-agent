@@ -97,6 +97,21 @@ func (c *Client) Configured() bool { return c != nil && c.APIKey != "" }
 var ErrPermanent = errors.New("permanent model error")
 
 func (c *Client) body(r Request, stream bool) map[string]any {
+	// OpenAI-compatible JSON mode (Qwen included) rejects a request whose
+	// messages never mention JSON — with a 400, which a retry cannot fix.
+	// Guarantee it here rather than trusting every prompt author to remember.
+	if r.JSON {
+		mentions := false
+		for _, m := range r.Messages {
+			if strings.Contains(strings.ToLower(m.Content), "json") {
+				mentions = true
+				break
+			}
+		}
+		if !mentions {
+			r.Messages = append(append([]Message(nil), r.Messages...), Message{Role: "system", Content: "Respond with a single JSON object."})
+		}
+	}
 	msgs := make([]any, len(r.Messages))
 	for i, m := range r.Messages {
 		msgs[i] = m
