@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,11 +29,22 @@ func Open(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := pool.Ping(ctx); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("database unreachable: %w", err)
+	// A new pod can dial before the node's network-policy controller has
+	// admitted its IP; the first attempts are refused. Wait it out (bounded)
+	// instead of crash-looping.
+	var err2 error
+	for i := 0; i < 15; i++ {
+		if err2 = pool.Ping(ctx); err2 == nil {
+			return pool, nil
+		}
+		select {
+		case <-ctx.Done():
+			i = 15
+		case <-time.After(2 * time.Second):
+		}
 	}
-	return pool, nil
+	pool.Close()
+	return nil, fmt.Errorf("database unreachable: %w", err2)
 }
 
 // Migrate applies every migration not yet in schema_migrations, each in its own
