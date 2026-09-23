@@ -70,8 +70,8 @@ YOU ARE NOW WORKING IN THE BACKGROUND on one task of a durable plan. Nobody is w
 - Save work products with save_document. Cite only authorities you have seen in a tool result, and run legal_verify_citations on anything that cites cases.
 - Anything that sends, files, orders or prescribes is approved by a person first — call the tool with the exact final arguments; the system pauses and asks.
 - If you are blocked by missing information, say precisely what is missing in your final answer; do not invent it.
-- Finish with a concise summary of what you did and what you produced (document ids), in English, for the plan's record.`,
-		now.UTC().Format("2006-01-02"), LangName(lang))
+- Finish with a concise summary of what you did and what you produced (document ids), written in %s — the client reads it on their case page.`,
+		now.UTC().Format("2006-01-02"), LangName(lang), LangName(lang))
 }
 
 func LangName(lang string) string {

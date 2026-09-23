@@ -72,6 +72,11 @@ func Load() (Config, error) {
 			c.AdminEmails = append(c.AdminEmails, e)
 		}
 	}
+	// The relay only lets a login send as its own address (spoof protection),
+	// so the login IS the From address unless one is set explicitly.
+	if c.SMTPFrom == "" {
+		c.SMTPFrom = c.SMTPUser
+	}
 	if c.DatabaseURL == "" {
 		return c, fmt.Errorf("ACT_DATABASE_URL is required")
 	}

@@ -39,7 +39,7 @@ type Worker struct {
 	Hook func(t *Task, step int)
 }
 
-const defaultMaxSteps = 8
+const defaultMaxSteps = 12
 
 func NewWorkerID() string {
 	h, _ := os.Hostname()
@@ -284,12 +284,25 @@ func (w *Worker) runLLM(ctx context.Context, g *Goal, t *Task) (map[string]any, 
 		}
 	}
 
-	for cp.Step < maxSteps+cp.Verifier {
+	for cp.Step < maxSteps+2*cp.Verifier {
 		if err := w.checkGoal(ctx, g.ID); err != nil {
 			return nil, err
 		}
+		// Budget awareness: a model that does not know it is running out keeps
+		// researching. Warn it near the end; on the last step take the tools
+		// away so it must write up what it has.
+		remaining := maxSteps + 2*cp.Verifier - cp.Step
+		stepDefs := defs
+		if remaining <= 3 && len(msgs) > 0 && msgs[len(msgs)-1].Role == "tool" {
+			note := fmt.Sprintf("[system] %d step(s) left for this task. Stop gathering; finish the deliverable with what you have now (save it if the task needs a document), then give your final summary.", remaining)
+			if remaining <= 1 {
+				note = "[system] This is the last step. Tools are no longer available: write your final summary now, stating anything still missing."
+				stepDefs = nil
+			}
+			msgs = append(msgs, llm.Message{Role: "user", Content: note})
+		}
 		resp, err := w.Model.Chat(ctx, CallMeta{Purpose: "task", UserID: g.UserID, GoalID: g.ID, TaskID: t.ID, CountIteration: true},
-			llm.Request{Model: w.LLM, Messages: msgs, Tools: defs, Temperature: 0.3})
+			llm.Request{Model: w.LLM, Messages: msgs, Tools: stepDefs, Temperature: 0.3})
 		if err != nil {
 			return nil, err
 		}
@@ -359,7 +372,10 @@ func (w *Worker) runLLM(ctx context.Context, g *Goal, t *Task) (map[string]any, 
 			return nil, errStopped
 		}
 	}
-	return nil, fmt.Errorf("step budget of %d exhausted without finishing", maxSteps)
+	// Not retryable: a retry resumes from the last checkpoint, which is already
+	// at the budget. The replanner decides — rewrite the task (which clears its
+	// checkpoint), split it, or ask a person.
+	return nil, fmt.Errorf("%w: step budget of %d exhausted without finishing", errPermanentTask, maxSteps)
 }
 
 func (w *Worker) checkGoal(ctx context.Context, goalID string) error {

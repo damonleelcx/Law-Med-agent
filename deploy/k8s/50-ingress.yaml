@@ -1,0 +1,57 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata: { name: redirect-https, namespace: act }
+spec:
+  redirectScheme: { scheme: https, permanent: true }
+---
+# Rate limit at the edge bounds how fast one address can spend model tokens;
+# the per-account and per-deployment daily caps bound how much.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata: { name: rate-limit, namespace: act }
+spec:
+  rateLimit:
+    average: 60
+    burst: 120
+    period: 1m
+    sourceCriterion: { ipStrategy: { depth: 0 } }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: act
+  namespace: act
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: act-rate-limit@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: act.heros-agent.space
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: act-web, port: { number: 80 } } }
+  tls:
+    - hosts: [act.heros-agent.space]
+      secretName: act-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: act-http-redirect
+  namespace: act
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: act-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: act.heros-agent.space
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: act-web, port: { number: 80 } } }

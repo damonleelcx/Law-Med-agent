@@ -22,10 +22,51 @@ type PlannedTask struct {
 	Key          string   `json:"key"`
 	Title        string   `json:"title"`
 	Instructions string   `json:"instructions"`
-	Tools        []string `json:"tools"`
-	Deps         []string `json:"deps"`
-	Verify       []string `json:"verify"`
-	WaitDays     float64  `json:"wait_days"`
+	Tools        strList  `json:"tools"`
+	Deps         strList  `json:"deps"`
+	Verify       strList  `json:"verify"`
+	WaitDays     flexNum  `json:"wait_days"`
+}
+
+// strList accepts ["a","b"], "a", "a, b" or null — models are inconsistent
+// about list fields, and a shape quibble should not cost a whole replan.
+type strList []string
+
+func (l *strList) UnmarshalJSON(b []byte) error {
+	var arr []string
+	if err := json.Unmarshal(b, &arr); err == nil {
+		*l = arr
+		return nil
+	}
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		*l = nil
+		return nil
+	}
+	var out []string
+	for _, p := range strings.Split(s, ",") {
+		if p = strings.TrimSpace(p); p != "" {
+			out = append(out, p)
+		}
+	}
+	*l = out
+	return nil
+}
+
+// flexNum accepts 7, 7.0 or "7".
+type flexNum float64
+
+func (n *flexNum) UnmarshalJSON(b []byte) error {
+	var f float64
+	if err := json.Unmarshal(b, &f); err == nil {
+		*n = flexNum(f)
+		return nil
+	}
+	var s string
+	_ = json.Unmarshal(b, &s)
+	fmt.Sscan(s, &f)
+	*n = flexNum(f)
+	return nil
 }
 
 type Planner struct {
@@ -41,7 +82,7 @@ func fromSkill(sk *skills.Skill) []PlannedTask {
 	out := make([]PlannedTask, 0, len(sk.Steps))
 	for _, s := range sk.Steps {
 		out = append(out, PlannedTask{Key: s.Key, Title: s.Title, Instructions: s.Instructions, Tools: s.Tools,
-			Deps: s.Deps, Verify: s.Verify, WaitDays: float64(s.WaitDays)})
+			Deps: s.Deps, Verify: s.Verify, WaitDays: flexNum(s.WaitDays)})
 	}
 	return out
 }
@@ -138,7 +179,7 @@ func insertTasks(ctx context.Context, tx pgx.Tx, goalID string, planVersion int,
 		if p.WaitDays > 0 && p.Instructions == "" {
 			kind = "wait"
 		}
-		spec, _ := json.Marshal(TaskSpec{Instructions: p.Instructions, Tools: p.Tools, Verify: p.Verify, WaitDays: p.WaitDays})
+		spec, _ := json.Marshal(TaskSpec{Instructions: p.Instructions, Tools: p.Tools, Verify: p.Verify, WaitDays: float64(p.WaitDays)})
 		if _, err := tx.Exec(ctx, `INSERT INTO tasks (goal_id, key, title, kind, spec, status, depth, plan_version)
 			VALUES ($1,$2,$3,$4,$5,'blocked',$6,$7) ON CONFLICT (goal_id, key) DO NOTHING`,
 			goalID, p.Key, p.Title, kind, spec, depth[p.Key], planVersion); err != nil {
@@ -410,22 +451,35 @@ Never skip or cancel a professional sign-off or a citation check that the goal s
 			rename[op.Task.Key] = nk
 		}
 	}
+	// Each op is checked on its own. An invalid op is dropped and recorded,
+	// not allowed to sink the valid ones; a request to redo finished work
+	// becomes a new follow-up task, which is what it means.
+	var ops []replanOp
+	var dropped []string
 	for i, op := range out.Ops {
 		switch op.Op {
 		case "retry", "skip", "cancel", "update":
 			x := byKey[op.Key]
-			if x == nil || x.Kind == "plan" || x.Kind == "finish" {
-				return fmt.Errorf("op %d: no task %q", i, op.Key)
+			switch {
+			case x == nil || x.Kind == "plan" || x.Kind == "finish":
+				dropped = append(dropped, fmt.Sprintf("op %d: no task %q", i, op.Key))
+				continue
+			case x.Status == "succeeded" && (op.Op == "retry" || op.Op == "update") && op.Instructions != "":
+				nk := fmt.Sprintf("v%d-%s-redo", pv, x.Key)
+				adds = append(adds, PlannedTask{Key: nk, Title: x.Title, Instructions: op.Instructions,
+					Tools: x.Spec.Tools, Verify: x.Spec.Verify})
+				continue
+			case x.Status == "succeeded":
+				dropped = append(dropped, fmt.Sprintf("op %d: %q already succeeded", i, op.Key))
+				continue
+			case (op.Op == "skip" || op.Op == "cancel") && containsAny(x.Spec.Verify, "signed_off", "citations_verified"):
+				dropped = append(dropped, fmt.Sprintf("op %d: refused to drop safety step %q", i, op.Key))
+				continue
+			case op.Op == "update" && x.Status != "blocked" && x.Status != "ready":
+				dropped = append(dropped, fmt.Sprintf("op %d: %q is %s and cannot be updated", i, op.Key, x.Status))
+				continue
 			}
-			if x.Status == "succeeded" {
-				return fmt.Errorf("op %d: %q already succeeded", i, op.Key)
-			}
-			if (op.Op == "skip" || op.Op == "cancel") && containsAny(x.Spec.Verify, "signed_off", "citations_verified") {
-				return fmt.Errorf("op %d: refusing to drop safety step %q", i, op.Key)
-			}
-			if op.Op == "update" && x.Status != "blocked" && x.Status != "ready" {
-				return fmt.Errorf("op %d: %q is %s and cannot be updated", i, op.Key, x.Status)
-			}
+			ops = append(ops, op)
 		case "add":
 			nt := op.Task
 			nt.Key = rename[nt.Key]
@@ -436,9 +490,10 @@ Never skip or cancel a professional sign-off or a citation check that the goal s
 			}
 			adds = append(adds, nt)
 		default:
-			return fmt.Errorf("op %d: unknown op %q", i, op.Op)
+			dropped = append(dropped, fmt.Sprintf("op %d: unknown op %q", i, op.Op))
 		}
 	}
+	out.Ops = ops
 	var depth map[string]int
 	if len(adds) > 0 {
 		if depth, err = validate(adds, existing, g.Limits); err != nil {
@@ -505,7 +560,7 @@ Never skip or cancel a professional sign-off or a citation check that the goal s
 			return err
 		}
 		return eventTx(ctx, tx, g.UserID, g.ID, t.ID, "goal.replanned", map[string]any{
-			"mode": t.Spec.Mode, "reason": t.Spec.Reason, "why": out.Assessment, "ops": out.Ops})
+			"mode": t.Spec.Mode, "reason": t.Spec.Reason, "why": out.Assessment, "ops": out.Ops, "added": len(adds), "dropped": dropped})
 	})
 	if err != nil {
 		return err
