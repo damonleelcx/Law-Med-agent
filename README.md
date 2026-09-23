@@ -1,5 +1,17 @@
 # ACT · Vera — counsel & care
 
+<p align="center">
+  <img src="web/public/vera/vera-full.webp" alt="Vera, full length: white coat over a navy vest and pleated skirt, teal bow, stethoscope and a scales-of-justice pin" height="420">
+  &nbsp;&nbsp;&nbsp;
+  <img src="web/public/vera/vera-portrait.webp" alt="Vera, portrait" height="260">
+</p>
+<p align="center">
+  <img src="web/public/vera/vera-face-smile.webp" alt="Vera listening" width="72">
+  <img src="web/public/vera/vera-face-think.webp" alt="Vera thinking" width="72">
+  <img src="web/public/vera/vera-face-laugh.webp" alt="Vera with good news" width="72">
+</p>
+<p align="center"><b>Vera · 维拉</b>: counsel &amp; care companion. An AI, not a lawyer or a doctor; she works with licensed ones.</p>
+
 **Live: https://act.heros-agent.space** · English / 中文
 
 Vera is one AI companion that works in law and medicine together. She takes
@@ -71,7 +83,7 @@ Timeline ◄── Checkpoint ◄── Verification ◄── Tools (typed, gat
 ## Run it locally
 
 ```bash
-docker run -d --name act-pg -e POSTGRES_USER=act -e POSTGRES_PASSWORD=act_dev_pw -e POSTGRES_DB=act -p 127.0.0.1:55850:5432 postgres:17
+docker run -d --name act-pg -e POSTGRES_USER=act -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=act -p 127.0.0.1:55850:5432 postgres:17
 ```
 
 ```bash
@@ -79,16 +91,16 @@ docker run -d --name act-pg -e POSTGRES_USER=act -e POSTGRES_PASSWORD=act_dev_pw
 ```
 
 ```bash
-ACT_DATABASE_URL='postgres://act:act_dev_pw@127.0.0.1:55850/act?sslmode=disable' ACT_LLM_API_KEY=… ACT_COOKIE_SECURE=false ACT_PUBLIC_ORIGIN=http://localhost:8080 ./bin/act serve
+ACT_DATABASE_URL='postgres://act@127.0.0.1:55850/act?sslmode=disable' ACT_LLM_API_KEY=… ACT_COOKIE_SECURE=false ACT_PUBLIC_ORIGIN=http://localhost:8080 ./bin/act serve
 ```
 
-Without SMTP settings, verification and reset links are printed to the log.
+The local Postgres uses trust authentication, bound to 127.0.0.1 only, so no password is needed or committed. Put these settings in a git-ignored `.env` and run `scripts/dev.sh`. Without SMTP settings, verification and reset links are printed to the log.
 `npm --prefix web run dev` serves the UI with hot reload and proxies `/api` to `:8080`.
 
 ## Test
 
 ```bash
-ACT_TEST_DATABASE_URL='postgres://act:act_dev_pw@127.0.0.1:55850/act?sslmode=disable' go test ./... -p 1
+ACT_TEST_DATABASE_URL='postgres://act@127.0.0.1:55850/act?sslmode=disable' go test ./... -p 1
 ```
 
 ## Deploy
