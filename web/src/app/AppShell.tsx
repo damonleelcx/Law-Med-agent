@@ -107,7 +107,12 @@ function Shell() {
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
 
       <main className="main">
-        <button className="menu-btn mobile-only" onClick={() => setOpen(true)} aria-label="Menu"><IconMenu /></button>
+        {/* Phones: a real top bar, so nothing scrolls underneath a floating button. */}
+        <header className="mobile-bar mobile-only">
+          <button className="btn-icon-plain" onClick={() => setOpen(true)} aria-label="Menu"><IconMenu />{pending > 0 && <span className="dot-badge" />}</button>
+          <NavLink to="/app" className="side-logo" end><LogoMark size={24} /><span>ACT</span></NavLink>
+          <button className="btn-icon-plain" onClick={newChat} aria-label={t.app.newChat}><IconPlus size={20} /></button>
+        </header>
         <Routes>
           <Route index element={<Chat key="new" onChanged={loadConvs} />} />
           <Route path="c/:id" element={<Chat onChanged={loadConvs} />} />

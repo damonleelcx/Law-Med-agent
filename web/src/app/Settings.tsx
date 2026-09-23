@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import { PasswordInput } from '../pages/auth/AuthLayout'
 import { api, type User } from '../lib/api'
@@ -25,6 +25,11 @@ export default function Settings({ onPrefs }: { onPrefs: (p: Record<string, any>
   const [data, setData] = useState<SettingsData | null>(null)
   const [saved, setSaved] = useState('')
   const [err, setErr] = useState('')
+  const navRef = useRef<HTMLElement>(null)
+  // On phones the tab strip scrolls sideways; keep the active tab in view.
+  useEffect(() => {
+    navRef.current?.querySelector('.active')?.scrollIntoView({ block: 'nearest', inline: 'center' })
+  }, [tab, data])
 
   const load = useCallback(() => {
     api.get<SettingsData>('/api/settings').then((d) => { setData(d); onPrefs(d.preferences) }).catch((e) => setErr(e.message))
@@ -58,7 +63,7 @@ export default function Settings({ onPrefs }: { onPrefs: (p: Record<string, any>
         {saved && <span className="saved-flag">✓ {saved}</span>}
       </header>
       <div className="settings-grid">
-        <nav className="settings-nav" aria-label={t.settings.title}>
+        <nav className="settings-nav" ref={navRef} aria-label={t.settings.title}>
           {tabs.map((k) => (
             <NavLink key={k} to={`/app/settings/${k}`} className={current === k ? 'active' : ''}>{t.settings.tabs[k]}</NavLink>
           ))}
