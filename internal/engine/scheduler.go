@@ -201,7 +201,10 @@ func (s *Scheduler) deliverReminders(ctx context.Context) {
 	if err != nil {
 		return
 	}
-	type rem struct{ id, user, goal, text, email string; prefs []byte }
+	type rem struct {
+		id, user, goal, text, email string
+		prefs                       []byte
+	}
 	var rs []rem
 	for rows.Next() {
 		var r rem

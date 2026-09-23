@@ -15,11 +15,11 @@ func TestDeadlineRollsOverWeekendsAndHolidays(t *testing.T) {
 		court   bool
 		want    string
 	}{
-		{"2026-06-01", 30, false, "2026-07-01"},  // plain
-		{"2026-06-04", 30, false, "2026-07-06"},  // lands Sat Jul 4 → Mon Jul 6 (Jul 3 observed holiday is Fri, not counted as landing)
-		{"2026-12-04", 21, false, "2026-12-28"},  // Fri Dec 25 holiday → lands Dec 25 → next court day Mon Dec 28
-		{"2026-09-01", 5, true, "2026-09-09"},    // court days skip Labor Day Mon Sep 7
-		{"2026-01-15", 3, false, "2026-01-20"},   // lands Sun Jan 18 → Mon Jan 19 is MLK Day → Tue Jan 20
+		{"2026-06-01", 30, false, "2026-07-01"}, // plain
+		{"2026-06-04", 30, false, "2026-07-06"}, // lands Sat Jul 4 → Mon Jul 6 (Jul 3 observed holiday is Fri, not counted as landing)
+		{"2026-12-04", 21, false, "2026-12-28"}, // Fri Dec 25 holiday → lands Dec 25 → next court day Mon Dec 28
+		{"2026-09-01", 5, true, "2026-09-09"},   // court days skip Labor Day Mon Sep 7
+		{"2026-01-15", 3, false, "2026-01-20"},  // lands Sun Jan 18 → Mon Jan 19 is MLK Day → Tue Jan 20
 	}
 	for _, c := range cases {
 		got, _ := Deadline(d(c.trigger), c.days, c.court)

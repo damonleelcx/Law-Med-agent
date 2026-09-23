@@ -35,12 +35,12 @@ func init() {
 			var res struct {
 				Count   int `json:"count"`
 				Results []struct {
-					CaseName   string   `json:"caseName"`
-					Citation   []string `json:"citation"`
-					Court      string   `json:"court"`
-					DateFiled  string   `json:"dateFiled"`
-					URL        string   `json:"absolute_url"`
-					Opinions   []struct {
+					CaseName  string   `json:"caseName"`
+					Citation  []string `json:"citation"`
+					Court     string   `json:"court"`
+					DateFiled string   `json:"dateFiled"`
+					URL       string   `json:"absolute_url"`
+					Opinions  []struct {
 						Snippet string `json:"snippet"`
 					} `json:"opinions"`
 				} `json:"results"`

@@ -224,7 +224,9 @@ func init() {
 		Effect: Write, Gate: G2,
 		GateFor: func(a map[string]any) (Gate, string) { return G2, str(a, "role") },
 		Timeout: 5 * time.Second,
-		Preview: func(a map[string]any) string { return str(a, "summary") + "\n\n(document " + str(a, "document_id") + ")" },
+		Preview: func(a map[string]any) string {
+			return str(a, "summary") + "\n\n(document " + str(a, "document_id") + ")"
+		},
 		Run: func(ctx context.Context, env *Env, a map[string]any) (map[string]any, error) {
 			if err := docBelongs(ctx, env, str(a, "document_id")); err != nil {
 				return nil, err

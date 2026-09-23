@@ -16,7 +16,7 @@ import (
 )
 
 type Goal struct {
-	ID, UserID, ConversationID     string
+	ID, UserID, ConversationID      string
 	Title, Objective, Domain, Skill string
 	Status                          string
 	Criteria, Milestones            []string

@@ -23,8 +23,11 @@ import (
 // Preference keys the client may set, with a validator each. Anything else is
 // rejected rather than stored, so the preferences blob stays meaningful.
 var prefKeys = map[string]func(any) bool{
-	"language":          func(v any) bool { s, ok := v.(string); return ok && (s == "en" || s == "zh") },
-	"verbosity":         func(v any) bool { s, ok := v.(string); return ok && (s == "brief" || s == "balanced" || s == "detailed") },
+	"language": func(v any) bool { s, ok := v.(string); return ok && (s == "en" || s == "zh") },
+	"verbosity": func(v any) bool {
+		s, ok := v.(string)
+		return ok && (s == "brief" || s == "balanced" || s == "detailed")
+	},
 	"tone":              func(v any) bool { s, ok := v.(string); return ok && (s == "warm" || s == "neutral" || s == "formal") },
 	"timezone":          func(v any) bool { s, ok := v.(string); _, err := time.LoadLocation(s); return ok && err == nil },
 	"notify_email":      func(v any) bool { _, ok := v.(bool); return ok },

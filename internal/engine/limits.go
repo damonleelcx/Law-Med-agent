@@ -11,15 +11,15 @@ import (
 // Limits bound one goal. Hitting any of them moves the goal to
 // needs_attention — it never runs on, and it never fails silently.
 type Limits struct {
-	MaxIterations   int     `json:"max_iterations"`    // LLM steps across all tasks
+	MaxIterations   int     `json:"max_iterations"` // LLM steps across all tasks
 	MaxToolCalls    int     `json:"max_tool_calls"`
 	MaxTokens       int     `json:"max_tokens"`
 	MaxCostUSD      float64 `json:"max_cost_usd"`
-	MaxDays         int     `json:"max_days"`          // wall clock since creation
-	MaxDepth        int     `json:"max_depth"`         // DAG depth
+	MaxDays         int     `json:"max_days"`  // wall clock since creation
+	MaxDepth        int     `json:"max_depth"` // DAG depth
 	MaxTasksPerPlan int     `json:"max_tasks_per_plan"`
 	MaxReplans      int     `json:"max_replans"`
-	MaxTotalTasks   int     `json:"max_total_tasks"`   // recursion guard across replans
+	MaxTotalTasks   int     `json:"max_total_tasks"` // recursion guard across replans
 }
 
 func (l Limits) WithDefaults() Limits {

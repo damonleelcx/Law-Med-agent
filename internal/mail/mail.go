@@ -17,11 +17,11 @@ import (
 )
 
 type Message struct {
-	To       string
-	Subject  string
-	Text     string
-	HTML     string
-	ReplyTo  string
+	To      string
+	Subject string
+	Text    string
+	HTML    string
+	ReplyTo string
 	// MessageID is set by the caller when the send is idempotent: the same
 	// logical message always carries the same id, so a receiving system that
 	// deduplicates on it sees one message.

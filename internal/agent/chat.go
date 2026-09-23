@@ -67,7 +67,7 @@ var intentSkill = map[string]string{
 	"legal.draft_document": "demand-letter", "legal.review_document": "contract-review", "legal.deadlines": "deadline-docketing",
 	"legal.court_prep": "hearing-preparation", "legal.court_filing": "motion-drafting", "legal.negotiation": "settlement-negotiation",
 	"legal.evidence": "evidence-organisation",
-	"med.intake": "symptom-assessment", "med.triage": "symptom-assessment", "med.differential": "symptom-assessment",
+	"med.intake":     "symptom-assessment", "med.triage": "symptom-assessment", "med.differential": "symptom-assessment",
 	"med.treatment_plan": "symptom-assessment", "med.prescription": "symptom-assessment", "med.test_order": "symptom-assessment",
 	"med.referral": "symptom-assessment", "med.results": "lab-review", "med.medications": "medication-reconciliation",
 	"med.follow_up": "chronic-care-plan", "med.records": "records-summary", "med.visit_prep": "pre-visit-summary",

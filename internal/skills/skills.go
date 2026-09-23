@@ -51,12 +51,12 @@ func All() []*Skill {
 
 // Tools shared by nearly every step.
 var (
-	base      = []string{"kb_search", "get_document", "memory_save", "notify_user"}
-	research  = []string{"legal_search_cases", "legal_statute_lookup", "legal_verify_citations"}
-	drafting  = []string{"save_document", "legal_verify_citations"}
-	clinical  = []string{"med_red_flag_check", "med_icd10_lookup", "med_drug_normalize", "med_drug_label", "med_interaction_check", "med_dose_calc", "med_pubmed_search"}
-	signoffA  = []string{"request_professional_signoff"}
-	remind    = []string{"schedule_reminder"}
+	base     = []string{"kb_search", "get_document", "memory_save", "notify_user"}
+	research = []string{"legal_search_cases", "legal_statute_lookup", "legal_verify_citations"}
+	drafting = []string{"save_document", "legal_verify_citations"}
+	clinical = []string{"med_red_flag_check", "med_icd10_lookup", "med_drug_normalize", "med_drug_label", "med_interaction_check", "med_dose_calc", "med_pubmed_search"}
+	signoffA = []string{"request_professional_signoff"}
+	remind   = []string{"schedule_reminder"}
 )
 
 func tl(groups ...[]string) []string {
