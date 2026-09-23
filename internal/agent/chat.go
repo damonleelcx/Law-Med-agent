@@ -84,7 +84,13 @@ type User struct {
 // Turn handles one user message end to end. Idempotent on clientMsgID: a
 // retried POST returns the reply that was already produced.
 func (a *Agent) Turn(ctx context.Context, u User, convID, text, clientMsgID string, sink Sink) (int64, error) {
-	lang := DetectLang(text, u.Lang)
+	// The language the client CHOSE wins. Guessing from the message is only a
+	// fallback for an account with no preference: a Chinese-speaking client
+	// who types three English words still expects to be answered in Chinese.
+	lang := u.Lang
+	if lang == "" {
+		lang = DetectLang(text, "")
+	}
 	userMsgID, dup, err := a.insertUserMessage(ctx, convID, text, clientMsgID)
 	if err != nil {
 		return 0, err
@@ -137,7 +143,7 @@ func (a *Agent) Turn(ctx context.Context, u User, convID, text, clientMsgID stri
 	// 2. Route.
 	var route Route
 	if preface == "" {
-		route = a.route(ctx, u, convID, text)
+		route = a.route(ctx, u, convID, text, lang)
 		meta["intent"], meta["confidence"] = route.Intent, route.Confidence
 	}
 	if lang == "" {
@@ -231,7 +237,7 @@ func (a *Agent) insertUserMessage(ctx context.Context, convID, text, clientMsgID
 	return id, false, err
 }
 
-func (a *Agent) route(ctx context.Context, u User, convID, text string) Route {
+func (a *Agent) route(ctx context.Context, u User, convID, text, lang string) Route {
 	goals, _ := a.Store.Goals(ctx, u.ID, 8)
 	var gl strings.Builder
 	for _, g := range goals {
@@ -260,8 +266,8 @@ RECENT CONVERSATION:
 
 LATEST MESSAGE: %q
 
-Return JSON: {"intent","confidence":0-1,"domain":"legal|medical|medlegal|general","goal_id":"","title":"short case title in the client's language","objective":"one sentence restating what the client wants done","clarify":"one question if confidence<0.6","language":"en|zh (the language of the latest message)","preference":{"key":"language|verbosity|tone|timezone","value":""}}`,
-		intents, gl.String(), a.Store.RecentConversation(ctx, convID, 6), text)
+Return JSON: {"intent","confidence":0-1,"domain":"legal|medical|medlegal|general","goal_id":"","title":"short case title in %s","objective":"one sentence restating what the client wants done","clarify":"one question if confidence<0.6","language":"en|zh (the language of the latest message)","preference":{"key":"language|verbosity|tone|timezone","value":""}}`,
+		intents, gl.String(), a.Store.RecentConversation(ctx, convID, 6), text, persona.LangName(lang))
 	resp, err := a.Model.Chat(ctx, engine.CallMeta{Purpose: "route", UserID: u.ID}, llm.Request{
 		Model: a.FastLLM, JSON: true, Temperature: 0, Messages: []llm.Message{{Role: "user", Content: prompt}}})
 	var r Route

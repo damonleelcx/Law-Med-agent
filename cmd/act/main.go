@@ -110,6 +110,7 @@ func run(mode string) error {
 	}
 
 	var srv *http.Server
+	var serveErr error
 	if mode == "serve" || mode == "web" {
 		authSvc := &auth.Service{Pool: pool, Mailer: mailer, PublicOrigin: originOr(cfg.PublicOrigin, cfg.Addr), SessionTTL: cfg.SessionTTL, AdminEmails: cfg.AdminEmails}
 		ag := &agent.Agent{Store: store, Model: model, LLM: cfg.LLMModel, FastLLM: cfg.LLMFastModel, Mailer: mailer, OnCallEmail: onCall}
@@ -119,7 +120,8 @@ func run(mode string) error {
 		start(func() {
 			slog.Info("listening", "addr", cfg.Addr, "mode", mode)
 			if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				slog.Error("http", "err", err)
+				// e.g. the port is taken: exit non-zero, don't look like a clean stop.
+				serveErr = fmt.Errorf("http server: %w", err)
 				stop()
 			}
 		})
@@ -142,7 +144,7 @@ func run(mode string) error {
 	case <-time.After(25 * time.Second):
 		slog.Warn("shutdown timed out; leases will expire and tasks resume elsewhere from their checkpoints")
 	}
-	return nil
+	return serveErr
 }
 
 func originOr(origin, addr string) string {
