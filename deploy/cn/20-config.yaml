@@ -19,11 +19,11 @@ data:
   ACT_ICP_LICENCE: "苏B2-20262623"
   ACT_ICP_BEIAN: ""
 
-  # Qwen on Alibaba Cloud Model Studio (Beijing): reachable from the node. The key
-  # is ACT_LLM_API_KEY in the act secret.
-  ACT_LLM_BASE_URL: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
-  ACT_LLM_MODEL: "qwen3.8-max"
-  ACT_LLM_FAST_MODEL: "qwen3.8-flash"
+  # Hunyuan on Tencent Cloud TokenHub (mainland China), OpenAI-compatible. The
+  # key is ACT_LLM_API_KEY in the act secret.
+  ACT_LLM_BASE_URL: "https://tokenhub.tencentmaas.com/v1"
+  ACT_LLM_MODEL: "hy4"
+  ACT_LLM_FAST_MODEL: "hy4-flash"
 
   # Mail: none, as on suki.zhiyuwujie.top (MAIL_DISABLED: verification and
   # reset links are logged, not sent; WeChat sign-in is the working path). The

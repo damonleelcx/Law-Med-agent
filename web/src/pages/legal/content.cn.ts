@@ -16,9 +16,12 @@ const UPDATED = '最后更新：2026 年 11 月 19 日'
 // receives: zhiyuwujie.top's MX is the heros relay, which delivers it to the
 // support@heros-agent.space mailbox.
 export const CONTACT = 'support@zhiyuwujie.top'
-// The operating entity's registered name, as on the ICP filing. Shown in both
-// documents; fill it in before launch.
-export const OPERATOR = 'ACT 运营方'
+// The operating entity, as on its value-added telecom licence 苏B2-20262623
+// (issued 2026-07-09 by 江苏省通信管理局, valid to 2031-07-09, covering
+// zhiyuwujie.top). The licence number is also ACT_ICP_LICENCE in the footers.
+export const OPERATOR = '南京知遇无界科技有限公司'
+const LICENCE = '苏B2-20262623'
+const OPERATOR_LINE = '运营者：' + OPERATOR + '；增值电信业务经营许可证编号：' + LICENCE + '。'
 
 export const cnTerms: Doc = {
   title: '服务条款',
@@ -65,7 +68,7 @@ export const cnTerms: Doc = {
     { h: '12. 法律适用与争议', p: [
       '本条款适用中华人民共和国法律（不含港澳台地区法律）。因本条款产生的争议，双方应先友好协商；协商不成的，任何一方可向' + OPERATOR + '所在地有管辖权的人民法院提起诉讼。',
     ] },
-    { h: '13. 联系我们', p: ['关于本条款的问题：' + CONTACT + '。'] },
+    { h: '13. 联系我们', p: ['关于本条款的问题：' + CONTACT + '。', OPERATOR_LINE] },
   ],
 }
 
@@ -89,8 +92,8 @@ export const cnPrivacy: Doc = {
     ] },
     { h: '四、委托处理与共享（仅限中国境内服务商）', p: [
       '阿里云计算有限公司——云服务器与数据库：ACT 的服务器和数据库托管于阿里云云服务器 ECS（浙江杭州）。',
-      '阿里云计算有限公司——AI 处理：为理解你的消息并完成工作，你的对话及相关案件材料会发送给阿里云百炼（通义千问大模型），在北京处理。',
       '阿里云计算有限公司——对象存储 OSS：数据库的加密备份可能保存在阿里云对象存储（中国境内）。',
+      '腾讯云计算（北京）有限责任公司——AI 处理：为理解你的消息并完成工作，你的对话及相关案件材料会发送给腾讯云 TokenHub（腾讯混元大模型），在中国境内处理。',
       '深圳市腾讯计算机系统有限公司——微信：在微信小程序中，微信登录、小程序运行及邮票的虚拟支付由微信提供，适用《微信隐私保护指引》。',
       '持证专业人士：当某项操作需要持证律师或医生批准时，负责审阅的专业人士会看到作出决定所需的案件材料，并负有保密义务。',
       '除上述情形以及法律法规要求、或经你单独同意外，我们不会向其他任何人提供你的个人信息。我们与受托方约定处理目的、方式和保护措施，并监督其处理活动。',
@@ -120,6 +123,7 @@ export const cnPrivacy: Doc = {
     { h: '十一、变更与联系', p: [
       '本政策如有变更，我们会在此公布新版本并更新上方日期；重大变更会以显著方式提示，必要时重新征得你的同意。',
       '个人信息保护相关事宜，请联系：' + CONTACT + '。',
+      OPERATOR_LINE,
     ] },
   ],
 }

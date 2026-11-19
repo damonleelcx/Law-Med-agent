@@ -77,11 +77,11 @@ func TestRouteEval(t *testing.T) {
 
 	base := os.Getenv("ACT_LLM_BASE_URL")
 	if base == "" {
-		base = "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+		base = "https://tokenhub.tencentmaas.com/v1"
 	}
 	client := llm.New(base, os.Getenv("ACT_LLM_API_KEY"))
 	store := &engine.Store{Pool: pool}
-	models := strings.Split(envOr("ACT_EVAL_MODELS", "qwen3.8-flash"), ",")
+	models := strings.Split(envOr("ACT_EVAL_MODELS", "hy4-flash"), ",")
 	for _, model := range models {
 		a := &Agent{Store: store, Model: &engine.Model{Client: client, Store: store}, FastLLM: model}
 		pass := 0

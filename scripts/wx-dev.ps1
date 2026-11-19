@@ -8,7 +8,7 @@
 #   curl.exe -X POST "http://127.0.0.1:8090/mock/grant?n=10"   add stamps (stands in for a purchase)
 #
 # Vera's replies come from devmock unless a model key is given, e.g.
-#   .\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName QWEN_LLM_API_KEY_V2
+#   .\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName HUNYUAN_LLM_API_KEY
 # which uses the real model (ACT's default base URL and models). The key is
 # handed to the container by name only: never on a command line, never printed.
 param([string]$KeyFile = '', [string]$KeyName = 'ACT_LLM_API_KEY')
