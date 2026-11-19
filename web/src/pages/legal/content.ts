@@ -109,7 +109,7 @@ export const privacy: Record<'en' | 'zh', Doc> = {
       ] },
       { h: 'Where your information goes', p: [
         'Hosting: ACT runs on servers and a database operated for us on Amazon Web Services in the United States.',
-        'AI processing: to understand your messages and do the work, your conversations and relevant case material are sent to an AI model service — currently Tencent Cloud TokenHub (Hunyuan), processed in mainland China. This is an international transfer of your information.',
+        'AI processing: to understand your messages and do the work, your conversations and relevant case material are sent to an AI model service — currently Alibaba Cloud Model Studio (Qwen), processed in Beijing, China. This is an international transfer of your information.',
         'Public research sources: when Vera researches, search terms such as a legal question or a medication name are sent to public services — CourtListener (Free Law Project), openFDA (U.S. Food and Drug Administration), the U.S. National Library of Medicine (RxNorm, Clinical Tables, PubMed) and Cornell’s Legal Information Institute. Your name and account are not sent.',
         'Licensed professionals: when an action needs a licensed attorney’s or physician’s approval, the professional reviewing it sees the case material needed to decide.',
         'Email: account and notification emails are sent through ACT’s own mail server. Notification emails do not contain the content of your case.',
@@ -146,7 +146,7 @@ export const privacy: Record<'en' | 'zh', Doc> = {
       ] },
       { h: '你的信息会去哪里', p: [
         '托管：ACT 运行在为我们托管于美国亚马逊云（Amazon Web Services）上的服务器和数据库中。',
-        'AI 处理：为理解你的消息并完成工作，你的对话及相关案件材料会发送给 AI 模型服务——目前为腾讯云 TokenHub（腾讯混元大模型），在中国境内处理。这属于信息的跨境传输。',
+        'AI 处理：为理解你的消息并完成工作，你的对话及相关案件材料会发送给 AI 模型服务——目前为阿里云百炼（通义千问），在中国北京处理。这属于信息的跨境传输。',
         '公开检索来源：维拉检索时，法律问题或药物名称等检索词会发送给公开服务——CourtListener（Free Law Project）、openFDA（美国食品药品监督管理局）、美国国家医学图书馆（RxNorm、Clinical Tables、PubMed）以及康奈尔大学法律信息研究所。你的姓名和账户信息不会被发送。',
         '持证专业人士：当某项操作需要持证律师或医生批准时，负责审阅的专业人士会看到作出决定所需的案件材料。',
         '邮件：账户和通知邮件通过 ACT 自己的邮件服务器发送。通知邮件不包含你的案件内容。',
