@@ -7,7 +7,7 @@
 #   LLM_KEY_FILE=D:/.ENV LLM_KEY_NAME=QWEN_LLM_API_KEY_V2 deploy/cn/secrets.sh
 #
 # Optional, each read from this shell's environment when set:
-#   act-mail    ACT_SMTP_USERNAME ACT_SMTP_PASSWORD [ACT_SMTP_FROM]       (DirectMail)
+#   act-mail    ACT_SMTP_USERNAME ACT_SMTP_PASSWORD [ACT_SMTP_FROM]       (none today, as on suki)
 #   act-wechat  ACT_WX_APPID ACT_WX_APPSECRET [ACT_WX_OFFER_ID ACT_WX_PAY_APPKEY]
 #   act-backup  OSS_ENDPOINT OSS_BUCKET OSS_ACCESS_KEY_ID OSS_ACCESS_KEY_SECRET
 set -euo pipefail

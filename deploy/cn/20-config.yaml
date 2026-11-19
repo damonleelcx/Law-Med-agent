@@ -25,11 +25,10 @@ data:
   ACT_LLM_MODEL: "qwen3.8-max"
   ACT_LLM_FAST_MODEL: "qwen3.8-flash"
 
-  # Mail: Alibaba Cloud DirectMail (邮件推送) over STARTTLS on port 80 (ECS
-  # blocks outbound 25). The login is in the optional act-mail secret; without
-  # it, sign-up links are logged instead of sent (MAIL_DISABLED).
-  ACT_SMTP_HOST: "smtpdm.aliyun.com"
-  ACT_SMTP_PORT: "80"
+  # Mail: none, as on suki.zhiyuwujie.top (MAIL_DISABLED: verification and
+  # reset links are logged, not sent; WeChat sign-in is the working path). The
+  # published address support@zhiyuwujie.top only receives: the domain's MX is
+  # the heros relay, which delivers it to the support@heros-agent.space mailbox.
 
   # WeChat mini program: 0 production, 1 sandbox. Keys are in the optional
   # act-wechat secret.

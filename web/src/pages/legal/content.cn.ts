@@ -3,14 +3,19 @@
 // mainland China, and that is enforced, not just written: on this copy
 // (ACT_REGION=cn) the server refuses every tool lookup to a service outside
 // mainland China (internal/tools/http.go MainlandOnly), the page loads no
-// Google Fonts, and mail goes through Alibaba Cloud DirectMail.
+// Google Fonts, and the service sends no email (as on suki.zhiyuwujie.top).
+// The one exception, stated in section 五: mail a person chooses to send to
+// support@zhiyuwujie.top is received by the heros relay on AWS (US).
 //
 // Keep this file true: if a provider, a location or a retention period
 // changes, change it here in the same commit.
 import type { Doc } from './content'
 
 const UPDATED = '最后更新：2026 年 11 月 19 日'
-const CONTACT = 'support@heros-agent.space'
+// The China copy's published address, as on suki.zhiyuwujie.top. It only
+// receives: zhiyuwujie.top's MX is the heros relay, which delivers it to the
+// support@heros-agent.space mailbox.
+export const CONTACT = 'support@zhiyuwujie.top'
 // The operating entity's registered name, as on the ICP filing. Shown in both
 // documents; fill it in before launch.
 export const OPERATOR = 'ACT 运营方'
@@ -85,14 +90,14 @@ export const cnPrivacy: Doc = {
     { h: '四、委托处理与共享（仅限中国境内服务商）', p: [
       '阿里云计算有限公司——云服务器与数据库：ACT 的服务器和数据库托管于阿里云云服务器 ECS（浙江杭州）。',
       '阿里云计算有限公司——AI 处理：为理解你的消息并完成工作，你的对话及相关案件材料会发送给阿里云百炼（通义千问大模型），在北京处理。',
-      '阿里云计算有限公司——邮件推送：用邮箱注册时，验证、重置密码及通知邮件通过阿里云邮件推送服务发送。通知邮件不包含你的案件内容。',
       '阿里云计算有限公司——对象存储 OSS：数据库的加密备份可能保存在阿里云对象存储（中国境内）。',
       '深圳市腾讯计算机系统有限公司——微信：在微信小程序中，微信登录、小程序运行及邮票的虚拟支付由微信提供，适用《微信隐私保护指引》。',
       '持证专业人士：当某项操作需要持证律师或医生批准时，负责审阅的专业人士会看到作出决定所需的案件材料，并负有保密义务。',
       '除上述情形以及法律法规要求、或经你单独同意外，我们不会向其他任何人提供你的个人信息。我们与受托方约定处理目的、方式和保护措施，并监督其处理活动。',
     ] },
     { h: '五、存储地点与跨境', p: [
-      '你的个人信息在中华人民共和国境内收集、存储和处理。中国版不会向境外提供你的个人信息：本服务不会访问境外的检索服务，页面也不从境外加载字体或脚本。',
+      '你在本服务中的个人信息在中华人民共和国境内收集、存储和处理。本服务不会访问境外的检索服务，页面也不从境外加载字体或脚本，也不向你发送电子邮件。',
+      '唯一的例外：你主动写信至 ' + CONTACT + ' 时，这封邮件由我们托管在亚马逊云（Amazon Web Services，美国）的邮件服务器接收，供我们回复你的问题。只涉及你自己写给我们的邮件内容和你的邮箱地址，不包括你在本服务中的对话、案件或文书。如不希望如此，你可以在“设置”中自行导出、更正或删除信息，无需写信。',
     ] },
     { h: '六、Cookie 与本地存储', p: [
       '网站只使用一个保持登录所必需的 Cookie，浏览器还会记住你选择的语言；小程序在本机保存登录凭证。没有广告或分析类 Cookie。',
