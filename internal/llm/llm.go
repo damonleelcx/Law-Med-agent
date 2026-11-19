@@ -97,7 +97,7 @@ func (c *Client) Configured() bool { return c != nil && c.APIKey != "" }
 var ErrPermanent = errors.New("permanent model error")
 
 func (c *Client) body(r Request, stream bool) map[string]any {
-	// OpenAI-compatible JSON mode (Qwen included) rejects a request whose
+	// OpenAI-compatible JSON mode (Qwen and others) rejects a request whose
 	// messages never mention JSON — with a 400, which a retry cannot fix.
 	// Guarantee it here rather than trusting every prompt author to remember.
 	if r.JSON {
@@ -139,9 +139,13 @@ func (c *Client) body(r Request, stream bool) map[string]any {
 	if r.MaxTokens > 0 {
 		b["max_tokens"] = r.MaxTokens
 	}
-	// Qwen's hybrid models think by default on this host; thinking output is
-	// neither shown nor needed, and it multiplies latency.
-	if strings.Contains(c.BaseURL, "aliyuncs.com") {
+	// Hybrid models think by default on these hosts; thinking output is
+	// neither shown nor needed, and it multiplies latency. Each host has its
+	// own switch: Hunyuan on Tencent TokenHub ignores enable_thinking.
+	switch {
+	case strings.Contains(c.BaseURL, "tencentmaas.com"):
+		b["thinking"] = map[string]string{"type": "disabled"}
+	case strings.Contains(c.BaseURL, "aliyuncs.com"):
 		b["enable_thinking"] = false
 	}
 	if stream {

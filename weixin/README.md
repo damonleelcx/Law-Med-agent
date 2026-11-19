@@ -122,7 +122,7 @@ Guarantees, enforced by the `stamp_ledger` table (migration `0003_wechat.sql`):
 
 ```powershell
 .\scripts\wx-dev.ps1                                              # replies from devmock
-.\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName QWEN_LLM_API_KEY_V2  # replies from the real model
+.\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName HUNYUAN_LLM_API_KEY  # replies from the real model
 curl.exe -X POST "http://127.0.0.1:8090/mock/grant?n=10"           # add stamps (the simulator cannot pay)
 ```
 

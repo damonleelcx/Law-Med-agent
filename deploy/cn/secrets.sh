@@ -4,7 +4,7 @@
 # the database password is generated once and then kept.
 #
 #   CN_HOST=root@121.43.114.65 CN_KEY=~/.ssh/suki_cn \
-#   LLM_KEY_FILE=D:/.ENV LLM_KEY_NAME=QWEN_LLM_API_KEY_V2 deploy/cn/secrets.sh
+#   LLM_KEY_FILE=D:/.ENV LLM_KEY_NAME=HUNYUAN_LLM_API_KEY deploy/cn/secrets.sh
 #
 # Optional, each read from this shell's environment when set:
 #   act-mail    ACT_SMTP_USERNAME ACT_SMTP_PASSWORD [ACT_SMTP_FROM]       (none today, as on suki)
