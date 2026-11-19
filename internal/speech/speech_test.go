@@ -98,7 +98,7 @@ func fakeHub(t *testing.T) (*httptest.Server, *int32) {
 				w.Write([]byte(`{"Response":{"Error":{"Code":"InvalidParameterValue","Message":"field 'text' too long"}}}`))
 				return
 			}
-			if v := in["voice_setting"].(map[string]any)["voice_id"]; v != float64(603002) {
+			if v := in["voice_setting"].(map[string]any)["voice_id"]; v != float64(602003) {
 				t.Errorf("voice %v", v)
 			}
 			json.NewEncoder(w).Encode(map[string]any{"status": "completed", "data": map[string]string{"audio_url": srv.URL + "/audio?t=" + url.QueryEscape(text)}})
@@ -112,7 +112,7 @@ func fakeHub(t *testing.T) (*httptest.Server, *int32) {
 func TestTranscribeAndSynthesize(t *testing.T) {
 	srv, calls := fakeHub(t)
 	defer srv.Close()
-	c := &Client{BaseURL: srv.URL + "/v1", APIKey: "k", ASRModel: "asr-m", TTSModel: "tts-m", Voice: 603002}
+	c := &Client{BaseURL: srv.URL + "/v1", APIKey: "k", ASRModel: "asr-m", TTSModel: "tts-m", Voice: 602003}
 	text, tokens, err := c.Transcribe(context.Background(), "https://example.com/clip.mp3")
 	if err != nil || text != "房东不退押金怎么办" || tokens != 48 {
 		t.Fatalf("transcribe: %q %d %v", text, tokens, err)

@@ -61,7 +61,7 @@ func TestVoiceInAndOut(t *testing.T) {
 	store := &engine.Store{Pool: pool}
 	s := &Server{Pool: pool, Auth: &auth.Service{Pool: pool, Mailer: mail.Log{}, SessionTTL: time.Hour}, Hub: NewHub(), Store: store,
 		Agent:  &agent.Agent{Store: store, Model: &engine.Model{Store: store}},
-		Speech: &speech.Client{BaseURL: hub.URL + "/v1", APIKey: "k", ASRModel: "hy-asr", TTSModel: "tts", Voice: 603002}}
+		Speech: &speech.Client{BaseURL: hub.URL + "/v1", APIKey: "k", ASRModel: "hy-asr", TTSModel: "tts", Voice: 602003}}
 	fx := &fakeWX{t: t, appKey: "appkey", balance: map[string]int{}, keys: map[string]string{}, orders: map[string]bool{}}
 	wxSrv := httptest.NewServer(fx)
 	defer wxSrv.Close()

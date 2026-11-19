@@ -30,7 +30,7 @@ data:
   # replies read aloud. Both are billed per token (按量付费); "" turns one off.
   ACT_ASR_MODEL: "hy-asr-3.0-preview"
   ACT_TTS_MODEL: "tenlai-tts-v1.0"
-  ACT_TTS_VOICE: "603002" # 软萌心心
+  ACT_TTS_VOICE: "602003" # 爱小悠 (情感丰富 · 女声)
 
   # Mail: none, as on suki.zhiyuwujie.top (MAIL_DISABLED: verification and
   # reset links are logged, not sent; WeChat sign-in is the working path). The

@@ -85,7 +85,7 @@ func Load() (Config, error) {
 		LLMFastModel:          env("ACT_LLM_FAST_MODEL", "qwen3.8-flash"),
 		ASRModel:              strings.TrimSpace(os.Getenv("ACT_ASR_MODEL")),
 		TTSModel:              strings.TrimSpace(os.Getenv("ACT_TTS_MODEL")),
-		TTSVoice:              envInt("ACT_TTS_VOICE", 603002), // 软萌心心
+		TTSVoice:              envInt("ACT_TTS_VOICE", 602003), // 爱小悠: expressive, female
 		SMTPHost:              os.Getenv("ACT_SMTP_HOST"),
 		SMTPPort:              envInt("ACT_SMTP_PORT", 587),
 		SMTPUser:              os.Getenv("ACT_SMTP_USERNAME"),

@@ -34,7 +34,7 @@
             <view wx:else class="prose"><rich-text nodes="{{item.html}}" user-select /></view>
             <view wx:if="{{!item.pending && item.content}}" class="acts">
               <view class="copy" data-i="{{index}}" bindtap="copy">{{s.copy}}</view>
-              <view wx:if="{{voiceOut && item.id}}" class="copy speak {{playing === item.id ? 'on' : ''}}" data-i="{{index}}" bindtap="speak">{{playing === item.id ? s.speakStop : s.speak}}</view>
+              <view wx:if="{{voiceOut && item.id}}" class="speak {{playing === item.id ? 'on' : ''}}" data-i="{{index}}" bindtap="speak">{{playing === item.id ? s.speakStop : s.speak}}</view>
             </view>
           </view>
         </view>

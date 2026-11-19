@@ -246,7 +246,8 @@ func env(k, d string) string {
 	return d
 }
 
-// sampleMP3 is "你好，我是维拉。" as Tencent's TTS speaks it.
+// sampleMP3 is Vera's voice (tenlai-tts-v1.0, voice 602003 爱小悠):
+// "你好，我是维拉。房东不退押金，先别急，我们一步一步来。"
 //
 //go:embed testdata/vera.mp3
 var sampleMP3 []byte
