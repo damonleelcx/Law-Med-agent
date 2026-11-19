@@ -225,7 +225,7 @@ function Bubble({ m, mood }: { m: Message; mood: Mood }) {
     <div className={`msg vera ${emergency ? 'emergency' : ''} ${update ? 'update' : ''}`}>
       <VeraFace mood={m.meta?.kind === 'complete' ? 'laugh' : mood} pulse={m.pending} />
       <div className="vera-body">
-        <div className="vera-name">Vera {emergency && <span className="em-tag"><IconAlert size={13} /> {t.app.emergency}</span>}</div>
+        <div className="vera-name">Vera <span className="ai-tag">{t.app.aiLabel}</span>{emergency && <span className="em-tag"><IconAlert size={13} /> {t.app.emergency}</span>}</div>
         {m.pending && !m.content ? (
           <div className="typing" aria-label={t.app.thinking}><i /><i /><i /></div>
         ) : (

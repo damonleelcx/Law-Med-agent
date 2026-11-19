@@ -63,7 +63,7 @@ if ($KeyFile) {
 
 docker run -d --name act-wx-server --network $net -p 127.0.0.1:8080:8080 -v "${root}/bin/linux:/app:ro" `
   -e ACT_DATABASE_URL='postgres://act@act-pg:5432/act_wxdev?sslmode=disable' `
-  -e ACT_ADDR=':8080' -e ACT_PUBLIC_ORIGIN='http://127.0.0.1:8080' -e ACT_COOKIE_SECURE=false `
+  -e ACT_ADDR=':8080' -e ACT_PUBLIC_ORIGIN='http://127.0.0.1:8080' -e ACT_COOKIE_SECURE=false -e ACT_REGION=cn `
   @model -e ACT_WORKERS=1 -e ACT_WX_API_BASE='http://act-wx-mock:8090' -e ACT_WX_APPID=touristappid -e ACT_WX_APPSECRET=devmock `
   -e ACT_WX_OFFER_ID=devmock-offer -e ACT_WX_PAY_APPKEY=dev-appkey -e ACT_WX_PAY_ENV=1 `
   golang:1.26 /app/act serve | Out-Null

@@ -27,6 +27,7 @@
           <view class="body">
             <view class="name">
               {{s.vera}}
+              <view class="ai-tag">{{s.aiLabel}}</view>
               <view wx:if="{{item.emergency}}" class="em-tag"><image src="/images/alert.svg" />{{s.emergency}}</view>
             </view>
             <view wx:if="{{item.pending && !item.content}}" class="typing"><view /><view /><view /></view>
@@ -36,11 +37,11 @@
         </view>
 
         <!-- A case appears after the message that opened it, and follows its plan live. -->
-        <goal-card wx:for="{{item.goals}}" wx:for-item="g" wx:key="id" goal="{{g}}" />
+        <goal-card class="goal-card" wx:for="{{item.goals}}" wx:for-item="g" wx:key="id" goal="{{g}}" />
       </block>
-      <goal-card wx:for="{{tail}}" wx:key="id" goal="{{item}}" />
+      <goal-card class="goal-card" wx:for="{{tail}}" wx:key="id" goal="{{item}}" />
       <view wx:for="{{approvals}}" wx:key="id" class="ap-wrap">
-        <approval-card a="{{item}}" bind:done="onApprovalDone" />
+        <approval-card class="approval-card" a="{{item}}" bind:done="onApprovalDone" />
       </view>
     </view>
     <view id="end" class="end" />

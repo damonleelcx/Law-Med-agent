@@ -126,6 +126,18 @@
   color: var(--text-2);
   margin: 4rpx 0 8rpx;
 }
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1rpx solid var(--line);
+  padding: 2rpx 14rpx;
+  border-radius: 99rpx;
+  letter-spacing: 1rpx;
+}
 .em-tag {
   display: inline-flex;
   align-items: center;

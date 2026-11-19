@@ -54,6 +54,7 @@
 @keyframes breathe { 50% { box-shadow: 0 0 0 5px rgba(232, 102, 42, .18); } }
 .vera-body { min-width: 0; position: relative; }
 .vera-name { font: 700 13px var(--font-display); color: var(--text-2); margin: 2px 0 4px; display: flex; gap: 8px; align-items: center; }
+.ai-tag { display: inline-flex; align-items: center; font: 600 11px var(--font-body); color: var(--text-2); background: var(--surface-2); border: 1px solid var(--line); padding: 1px 7px; border-radius: 99px; letter-spacing: .02em; }
 .em-tag { display: inline-flex; gap: 4px; align-items: center; font: 600 11.5px var(--font-body); color: #b3261e; background: rgba(216, 72, 59, .12); padding: 2px 8px; border-radius: 99px; }
 .msg.vera.emergency .prose > p:first-child { background: rgba(216, 72, 59, .1); border: 1px solid rgba(216, 72, 59, .3); padding: 12px 14px; border-radius: 14px; }
 .msg.vera.update .prose { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 16px; }
