@@ -24,6 +24,7 @@ import (
 	"github.com/damonleelcx/Law-Med-agent/internal/engine"
 	"github.com/damonleelcx/Law-Med-agent/internal/persona"
 	"github.com/damonleelcx/Law-Med-agent/internal/tools"
+	"github.com/damonleelcx/Law-Med-agent/internal/wechat"
 )
 
 type Server struct {
@@ -35,6 +36,11 @@ type Server struct {
 	CookieSecure bool
 	MailEnabled  bool
 	Hub          *Hub
+
+	// WeChat mini program. WX nil: WeChat sign-in is off. Stamps nil: messages
+	// are free (virtual payment is not configured).
+	WX     *wechat.Client
+	Stamps *wechat.Stamps
 
 	limiter *limiter
 }
@@ -105,6 +111,11 @@ func (s *Server) Handler() http.Handler {
 	m.HandleFunc("GET /api/admin/licenses", s.admin(s.licenses))
 	m.HandleFunc("POST /api/admin/licenses/{id}", s.admin(s.decideLicense))
 
+	// WeChat mini program: sign-in and stamps
+	m.HandleFunc("POST /api/wx/login", s.limit("wxlogin", 20, s.wxLogin))
+	m.HandleFunc("GET /api/wx/stamps", s.authed(s.wxStamps))
+	m.HandleFunc("POST /api/wx/stamps/order", s.limit("wxorder", 20, s.authed(s.wxOrder)))
+
 	m.HandleFunc("GET /api/stream", s.authed(s.stream))
 
 	m.Handle("/", s.spa())
@@ -162,11 +173,19 @@ func (w *statusWriter) Flush() {
 }
 
 func (s *Server) currentUser(r *http.Request) (*auth.User, string) {
-	c, err := r.Cookie(cookieName)
-	if err != nil {
+	// The mini program has no cookie jar: it sends the same session token as
+	// a bearer token. A bearer header cannot be forged cross-site, so it needs
+	// no CSRF defence beyond the one every API call already has.
+	raw := ""
+	if h := r.Header.Get("Authorization"); strings.HasPrefix(h, "Bearer ") {
+		raw = strings.TrimSpace(strings.TrimPrefix(h, "Bearer "))
+	} else if c, err := r.Cookie(cookieName); err == nil {
+		raw = c.Value
+	}
+	if raw == "" {
 		return nil, ""
 	}
-	u, sess, err := s.Auth.SessionUser(r.Context(), c.Value)
+	u, sess, err := s.Auth.SessionUser(r.Context(), raw)
 	if err != nil {
 		return nil, ""
 	}
@@ -188,10 +207,11 @@ func (s *Server) authed(h handler) http.HandlerFunc {
 }
 
 // verified gates everything that can spend model tokens behind a confirmed
-// email: an unverified account costs the operator nothing.
+// email: an unverified account costs the operator nothing. A WeChat account is
+// verified by WeChat itself, and pays per message in stamps.
 func (s *Server) verified(h handler) http.HandlerFunc {
 	return s.authed(func(w http.ResponseWriter, r *http.Request, u *auth.User) {
-		if !u.EmailVerified {
+		if !u.EmailVerified && !u.WeChat {
 			writeErr(w, 403, "email_unverified")
 			return
 		}

@@ -1,0 +1,78 @@
+.ap {
+  display: flex;
+  flex-direction: column;
+  border-radius: 36rpx;
+  padding: 28rpx 30rpx;
+  background: var(--surface);
+  border: 3rpx solid rgba(232, 102, 42, 0.45);
+  box-shadow: 0 16rpx 60rpx rgba(232, 102, 42, 0.12);
+}
+.ap.approved {
+  border-color: rgba(29, 158, 154, 0.4);
+  box-shadow: none;
+}
+.ap.rejected,
+.ap.superseded {
+  border-color: var(--line-strong);
+  box-shadow: none;
+  opacity: 0.85;
+}
+.ap-gate {
+  align-self: flex-start;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 6rpx 18rpx;
+  border-radius: 99rpx;
+  background: rgba(232, 102, 42, 0.12);
+  color: var(--ember-600);
+  margin-bottom: 12rpx;
+}
+.ap-gate.G2 {
+  background: rgba(35, 40, 70, 0.1);
+  color: var(--navy-800);
+}
+.ap-tool {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.ap-sub {
+  color: var(--text-3);
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+.ap-preview {
+  white-space: pre-wrap;
+  font-size: 26rpx;
+  line-height: 1.55;
+  background: var(--surface-2);
+  border-radius: 24rpx;
+  padding: 22rpx 24rpx;
+  margin: 22rpx 0;
+  max-height: 500rpx;
+  box-sizing: border-box;
+}
+.ap-note {
+  width: 100%;
+  margin-bottom: 18rpx;
+}
+.ap-err {
+  color: #b3261e;
+  font-size: 24rpx;
+  margin-bottom: 14rpx;
+}
+.ap-actions {
+  display: flex;
+  gap: 16rpx;
+}
+.ap-waiting,
+.ap-result {
+  color: var(--text-2);
+  font-size: 26rpx;
+}
+.ap-result.approved {
+  color: #0f6a67;
+}
+.ap-result.rejected {
+  color: #9d2c22;
+}

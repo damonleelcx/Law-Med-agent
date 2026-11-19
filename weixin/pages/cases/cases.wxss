@@ -1,0 +1,69 @@
+/* After the web app's .case-tile */
+.top {
+  margin-top: 32rpx;
+}
+.tiles {
+  margin-top: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.tile {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 40rpx;
+  padding: 36rpx 32rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6rpx;
+  background: var(--ember-500);
+}
+.tile.domain-medical::before {
+  background: var(--teal-500);
+}
+.tile.domain-legal::before {
+  background: var(--navy-800);
+}
+.tile.domain-medlegal::before {
+  background: linear-gradient(90deg, var(--ember-500), var(--teal-500));
+}
+.ct-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ct-domain {
+  color: var(--text-3);
+  font-weight: 600;
+  font-size: 22rpx;
+  letter-spacing: 0.08em;
+}
+.ct-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.ct-attn {
+  font-size: 25rpx;
+  color: #7a5410;
+}
+.tile .gc-bar {
+  margin: 14rpx 0 6rpx;
+}
+.ct-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 23rpx;
+  color: var(--text-3);
+}

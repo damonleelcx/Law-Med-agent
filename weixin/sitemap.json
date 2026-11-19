@@ -1,0 +1,4 @@
+{
+  "desc": "Conversations are private: nothing in this mini program is indexed.",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

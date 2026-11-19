@@ -1,0 +1,30 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view class="head">
+      <view class="h1">{{s.docs.title}}</view>
+      <button class="btn btn-ink btn-sm" hover-class="btn-hover" bindtap="upload">↑ {{s.docs.upload}}</button>
+    </view>
+    <view wx:if="{{msg}}" class="note">{{msg}}</view>
+
+    <view wx:if="{{!signedIn}}" class="empty-card" bindtap="signIn">
+      <image src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+      <text>{{s.loginToSeeDocs}}</text>
+    </view>
+    <block wx:else>
+      <view wx:if="{{docs === null}}" class="muted">{{s.loading}}</view>
+      <view wx:elif="{{!docs.length}}" class="empty-card">
+        <image src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+        <text>{{s.docs.empty}}</text>
+      </view>
+      <view wx:for="{{docs}}" wx:key="id" class="file-row" hover-class="row-hover" data-id="{{item.id}}" bindtap="open">
+        <view class="fr-icon">▤</view>
+        <view class="fr-text">
+          <text class="fr-title">{{item.title}}</text>
+          <text wx:if="{{item.from}}" class="fr-sub">{{item.from}}</text>
+          <text class="fr-sub">{{item.sub}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

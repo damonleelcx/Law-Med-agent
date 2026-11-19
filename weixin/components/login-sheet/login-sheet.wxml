@@ -1,0 +1,11 @@
+<view wx:if="{{show}}" class="mask" catchtouchmove="noop" bindtap="cancel">
+  <view class="sheet" catchtap="noop">
+    <view class="grab" />
+    <image class="vface face" src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+    <view class="title">{{s.loginTitle}}</view>
+    <view class="sub">{{s.loginSub}}</view>
+    <button class="btn btn-ember go" hover-class="btn-hover" disabled="{{busy}}" loading="{{busy}}" bindtap="confirm">{{s.loginBtn}}</button>
+    <view class="later" bindtap="cancel">{{s.loginLater}}</view>
+    <view class="terms">{{s.loginTerms}}</view>
+  </view>
+</view>

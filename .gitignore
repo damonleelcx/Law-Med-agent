@@ -7,3 +7,4 @@ internal/web/dist/*
 .env
 deploy/deploy.env
 *.test
+weixin/project.private.config.json

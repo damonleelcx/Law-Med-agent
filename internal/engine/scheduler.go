@@ -228,7 +228,8 @@ func (s *Scheduler) deliverReminders(ctx context.Context) {
 		zh := prefs["language"] == "zh"
 		prefix := map[bool]string{true: "⏰ 提醒：", false: "⏰ Reminder: "}[zh]
 		s.Store.PostMessage(ctx, conv, r.user, prefix+r.text, map[string]any{"goal_id": r.goal, "kind": "reminder"}, "reminder-"+r.id)
-		if v, ok := prefs["notify_email"].(bool); !ok || v {
+		// A WeChat account has no email; the reminder is in the chat.
+		if v, ok := prefs["notify_email"].(bool); r.email != "" && (!ok || v) {
 			subj := map[bool]string{true: "维拉提醒您", false: "A reminder from Vera"}[zh]
 			_, _ = s.Mailer.Send(ctx, mail.Message{To: r.email, Subject: subj,
 				Text: r.text + "\n\n" + s.PublicOrigin + "/app", MessageID: "reminder-" + r.id})

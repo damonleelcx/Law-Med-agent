@@ -1,0 +1,182 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view wx:if="{{!loaded}}" class="muted">{{s.loading}}</view>
+    <block wx:else>
+
+      <!-- 个人资料 -->
+      <block wx:if="{{tab === 'profile'}}">
+        <view class="card">
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.name}}</text></view>
+            <view class="inline">
+              <input class="input grow" value="{{name}}" bindinput="onName" maxlength="80" placeholder="{{s.settings.namePh}}" />
+              <button class="btn btn-ink btn-sm" hover-class="btn-hover" disabled="{{name === user.name}}" bindtap="saveName">{{s.settings.save}}</button>
+            </view>
+          </view>
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.account}}</text></view><text>{{hasEmail ? user.email : s.settings.wechatAccount}}</text></view>
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.role}}</text></view><text>{{user.role}}<text wx:if="{{user.licensed}}" class="ok-tag"> ✓ {{s.settings.lic.verified}}</text></text></view>
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.joined}}</text></view><text>{{user.joined}}</text></view>
+        </view>
+      </block>
+
+      <!-- 维拉的风格 -->
+      <block wx:if="{{tab === 'prefs'}}">
+        <view class="card">
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.language}}</text></view><text class="muted">{{s.settings.languageFixed}}</text></view>
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.tone}}</text></view>
+            <view class="seg">
+              <view wx:for="{{s.settings.tones}}" class="seg-item {{p.tone === item[0] ? 'on' : ''}}" data-key="tone" data-value="{{item[0]}}" bindtap="pick">{{item[1]}}</view>
+            </view>
+          </view>
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.verbosity}}</text></view>
+            <view class="seg">
+              <view wx:for="{{s.settings.verbosities}}" class="seg-item {{p.verbosity === item[0] ? 'on' : ''}}" data-key="verbosity" data-value="{{item[0]}}" bindtap="pick">{{item[1]}}</view>
+            </view>
+          </view>
+          <picker mode="selector" range="{{zones}}" value="{{zoneIndex}}" bindchange="onZone">
+            <view class="s-row"><view class="s-label"><text class="t">{{s.settings.timezone}}</text></view><text>{{zones[zoneIndex]}} ›</text></view>
+          </picker>
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.jurisdiction}}</text><text class="h">{{s.settings.jurisdictionHint}}</text></view>
+            <view class="inline">
+              <input class="input grow" value="{{jurisdiction}}" bindinput="onJur" maxlength="80" placeholder="上海 / 广东 / CA" />
+              <button class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="saveJur">{{s.settings.save}}</button>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 通知 -->
+      <block wx:if="{{tab === 'notify'}}">
+        <view wx:if="{{!hasEmail}}" class="attn note">{{s.settings.notifyWechat}}</view>
+        <view class="card">
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.notifyEmail}}</text></view>
+            <switch color="#E8662A" checked="{{p.notify_email}}" disabled="{{!hasEmail}}" data-key="notify_email" bindchange="toggle" /></view>
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.notifyApprovals}}</text></view>
+            <switch color="#E8662A" checked="{{p.notify_approvals}}" disabled="{{!hasEmail}}" data-key="notify_approvals" bindchange="toggle" /></view>
+        </view>
+      </block>
+
+      <!-- 隐私与记忆 -->
+      <block wx:if="{{tab === 'privacy'}}">
+        <view class="card">
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.memory}}</text><text class="h">{{s.settings.memoryHint}}</text></view>
+            <switch color="#E8662A" checked="{{p.memory_enabled}}" data-key="memory_enabled" bindchange="toggle" /></view>
+        </view>
+        <view class="section">{{s.settings.memories}}</view>
+        <view class="card">
+          <view wx:if="{{!memories.length}}" class="s-row muted">{{s.settings.noMemories}}</view>
+          <view wx:for="{{memories}}" wx:key="id" class="s-row">
+            <view class="s-label"><text>{{item.content}}</text></view>
+            <button class="btn btn-ghost btn-sm" hover-class="btn-hover" data-id="{{item.id}}" bindtap="forget">{{s.settings.forget}}</button>
+          </view>
+        </view>
+        <button wx:if="{{memories.length}}" class="btn btn-danger btn-sm gap" hover-class="btn-hover" bindtap="forgetAll">{{s.settings.forgetAll}}</button>
+
+        <view class="section">{{s.settings.export}}</view>
+        <view class="card card-pad">
+          <view class="muted small">{{s.settings.exportHint}}</view>
+          <button class="btn btn-soft btn-sm gap" hover-class="btn-hover" bindtap="exportData">{{s.settings.export}}</button>
+        </view>
+
+        <view class="section">{{s.settings.deleteAccount}}</view>
+        <view class="card card-pad danger">
+          <view class="muted small">{{s.settings.deleteHint}}</view>
+          <button class="btn btn-danger btn-sm gap" hover-class="btn-hover" bindtap="deleteAccount">{{s.settings.deleteAccount}}</button>
+        </view>
+      </block>
+
+      <!-- 已登录的设备 -->
+      <block wx:if="{{tab === 'security'}}">
+        <view class="card">
+          <view wx:for="{{sessions}}" wx:key="id" class="s-row">
+            <view class="s-label"><text class="t">{{item.device}}</text><text class="h">{{item.sub}}</text></view>
+            <text wx:if="{{item.current}}" class="ok-tag">{{s.settings.thisDevice}}</text>
+            <button wx:else class="btn btn-ghost btn-sm" hover-class="btn-hover" data-id="{{item.id}}" bindtap="revoke">{{s.settings.revoke}}</button>
+          </view>
+        </view>
+        <button wx:if="{{sessions.length > 1}}" class="btn btn-danger btn-sm gap" hover-class="btn-hover" bindtap="revokeOthers">{{s.settings.revokeOthers}}</button>
+      </block>
+
+      <!-- 额度与用量 -->
+      <block wx:if="{{tab === 'limits'}}">
+        <view class="muted small lead">{{s.settings.limitsHint}}</view>
+        <view class="card">
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.maxCost}}</text></view>
+            <view class="inline"><input class="input grow" type="digit" value="{{cost}}" bindinput="onCost" />
+              <button class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="saveCost">{{s.settings.save}}</button></view>
+          </view>
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.maxDays}}</text></view>
+            <view class="inline"><input class="input grow" type="number" value="{{days}}" bindinput="onDays" />
+              <button class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="saveDays">{{s.settings.save}}</button></view>
+          </view>
+        </view>
+        <view wx:if="{{usage}}" class="card card-pad usage">
+          <view><text class="u-n">{{usage.today}}</text>{{s.settings.tokens}}<text class="muted u-l">{{s.settings.today}}</text></view>
+          <view><text class="u-n">{{usage.month}}</text>{{s.settings.tokens}}<text class="muted u-l">{{s.settings.month}}</text></view>
+        </view>
+      </block>
+
+      <!-- 专业人士 -->
+      <block wx:if="{{tab === 'pro'}}">
+        <view class="card card-pad">
+          <view class="t-big">{{s.settings.proTitle}}</view>
+          <view class="muted small">{{s.settings.proSub}}</view>
+          <picker mode="selector" range="{{kindLabels}}" value="{{lic.kind}}" bindchange="onLicKind">
+            <view class="field"><text class="muted">{{s.settings.kind}}</text><text>{{kindLabels[lic.kind]}} ›</text></view>
+          </picker>
+          <input class="input full" value="{{lic.number}}" bindinput="onLicNumber" placeholder="{{s.settings.number}}" />
+          <input class="input full" value="{{lic.jur}}" bindinput="onLicJur" placeholder="{{s.settings.jur}}（上海 / CA / NY）" />
+          <button class="btn btn-ink btn-sm gap" hover-class="btn-hover" disabled="{{!lic.number || !lic.jur}}" bindtap="submitLicense">{{s.settings.submit}}</button>
+        </view>
+        <view wx:if="{{licenses.length}}" class="card gap">
+          <view wx:for="{{licenses}}" wx:key="id" class="s-row">
+            <view class="s-label"><text class="t">{{item.kind}}</text><text class="h">{{item.sub}}</text></view>
+            <text class="lic lic-{{item.status}}">{{item.statusLabel}}</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 外观 -->
+      <block wx:if="{{tab === 'look'}}">
+        <view class="card">
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.theme}}</text></view>
+            <view class="seg">
+              <view wx:for="{{s.settings.themes}}" class="seg-item {{p.theme === item[0] ? 'on' : ''}}" data-key="theme" data-value="{{item[0]}}" bindtap="pick">{{item[1]}}</view>
+            </view>
+          </view>
+          <view class="s-row col">
+            <view class="s-label"><text class="t">{{s.settings.fontSize}}</text></view>
+            <view class="seg">
+              <view wx:for="{{s.settings.sizes}}" class="seg-item {{p.font_size === item[0] ? 'on' : ''}}" data-key="font_size" data-value="{{item[0]}}" bindtap="pick">{{item[1]}}</view>
+            </view>
+          </view>
+          <view class="s-row"><view class="s-label"><text class="t">{{s.settings.reduceMotion}}</text></view>
+            <switch color="#E8662A" checked="{{p.reduce_motion}}" data-key="reduce_motion" bindchange="toggle" /></view>
+        </view>
+      </block>
+
+      <!-- 管理 -->
+      <block wx:if="{{tab === 'admin' && user.admin}}">
+        <view class="section">{{s.settings.adminTitle}}</view>
+        <view class="card">
+          <view wx:if="{{!adminRows.length}}" class="s-row muted">—</view>
+          <view wx:for="{{adminRows}}" wx:key="id" class="s-row col">
+            <view class="s-label"><text class="t">{{item.who}}</text><text class="h">{{item.sub}}</text></view>
+            <view wx:if="{{item.status === 'pending'}}" class="inline">
+              <button class="btn btn-ember btn-sm" hover-class="btn-hover" data-id="{{item.id}}" data-verify="yes" bindtap="decideLicense">{{s.settings.verify}}</button>
+              <button class="btn btn-ghost btn-sm" hover-class="btn-hover" data-id="{{item.id}}" data-verify="no" bindtap="decideLicense">{{s.settings.reject}}</button>
+            </view>
+            <text wx:else class="lic lic-{{item.status}}">{{item.statusLabel}}</text>
+          </view>
+        </view>
+      </block>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

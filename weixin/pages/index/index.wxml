@@ -1,0 +1,50 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <!-- Who Vera is: shown to everyone, signed in or not. -->
+    <view class="hero">
+      <view class="portrait"><image src="/images/vera-portrait.webp" webp mode="aspectFill" /></view>
+      <view class="hero-text">
+        <view class="name">{{s.vera}} <text class="muted tag">· {{s.tagline}}</text></view>
+        <view class="sub">{{s.greetingSub}}</view>
+      </view>
+    </view>
+
+    <button class="btn btn-ink new" hover-class="btn-hover" bindtap="create">＋ {{s.newChat}}</button>
+
+    <view wx:if="{{signedIn && (pending || (stampsEnabled && balance !== null))}}" class="chips">
+      <view wx:if="{{pending}}" class="chip" bindtap="approvals">! {{pending}} 项待审批</view>
+      <view wx:if="{{stampsEnabled && balance !== null}}" class="chip" bindtap="stamps">✉ {{balance}} · {{s.perMessage}}</view>
+    </view>
+
+    <view wx:if="{{!signedIn}}">
+      <view class="section">{{s.chats}}</view>
+      <view class="empty-card" bindtap="signIn">
+        <image src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+        <text>{{s.loginToSeeChats}}</text>
+      </view>
+    </view>
+
+    <block wx:else>
+      <view class="section-row">
+        <view class="section">{{archived ? s.archived : s.chats}}</view>
+        <text class="link" bindtap="toggleArchived">{{archived ? s.hideArchived : s.showArchived}}</text>
+      </view>
+      <input class="input search" value="{{q}}" bindinput="onSearch" placeholder="{{s.search}}" confirm-type="search" />
+
+      <view wx:if="{{!loading && !list.length}}" class="empty muted">{{s.empty}}</view>
+      <view class="list">
+        <view wx:for="{{list}}" wx:key="id" class="row" hover-class="row-hover-bg" data-id="{{item.id}}" data-i="{{index}}"
+          bindtap="open" bindlongpress="more">
+          <view class="row-top">
+            <text class="title">{{item.title}}</text>
+            <text class="when">{{item.when}}</text>
+          </view>
+          <text wx:if="{{item.last}}" class="last">{{item.last}}</text>
+        </view>
+      </view>
+    </block>
+
+    <view class="foot">{{s.disclaimer}}</view>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

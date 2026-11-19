@@ -48,6 +48,7 @@ Timeline ◄── Checkpoint ◄── Verification ◄── Tools (typed, gat
 | Settings: profile, Vera & language, notifications, privacy & memory, security, limits & usage, professional licence, appearance, admin | `web/src/app/Settings.tsx` |
 | Terms of Service and Privacy Policy (English / 中文) | `/terms`, `/privacy`, `web/src/pages/legal/content.ts` |
 | Bilingual (English / 中文) across the site, emails and Vera's replies | `web/src/lib/i18n.tsx`, `internal/auth` mail templates |
+| WeChat mini program: WeChat sign-in, streaming chat, stamps via WeChat virtual payment (1 stamp per message) | `weixin/` ([weixin/README.md](weixin/README.md)), `internal/wechat`, `internal/httpapi/wechat.go` |
 | Docker + k8s on the heros-prod k3s node | `Dockerfile`, `deploy/` |
 
 ## The principles, and where each one lives

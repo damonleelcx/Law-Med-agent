@@ -17,6 +17,9 @@ data:
   ACT_SMTP_HOST: "mail.heros-agent.space"
   ACT_SMTP_PORT: "587"
   ACT_SMTP_REPLY_TO: "support@heros-agent.space"
+  # WeChat virtual payment environment: 0 production, 1 sandbox. The keys
+  # themselves are in the act-wechat secret.
+  ACT_WX_PAY_ENV: "0"
   ACT_ADMIN_EMAILS: "damonlee1020@gmail.com"
   ACT_WORKERS: "3"
   ACT_LEASE: "90s"

@@ -1,0 +1,16 @@
+{
+  "description": "ACT · Vera — WeChat mini program",
+  "appid": "touristappid",
+  "projectname": "act-vera",
+  "compileType": "miniprogram",
+  "libVersion": "3.6.0",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true
+  },
+  "packOptions": { "ignore": [], "include": [] },
+  "condition": {}
+}

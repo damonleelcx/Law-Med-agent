@@ -1,0 +1,18 @@
+<view wx:if="{{v}}" class="ap {{v.status}}">
+  <text class="ap-gate {{v.gate}}">{{v.gateLabel}}</text>
+  <text class="ap-tool">{{v.tool}}</text>
+  <text wx:if="{{v.sub}}" class="ap-sub">{{v.sub}}</text>
+  <scroll-view scroll-y class="ap-preview"><text user-select>{{v.preview}}</text></scroll-view>
+  <block wx:if="{{v.pending}}">
+    <block wx:if="{{v.canDecide}}">
+      <input class="input ap-note" value="{{note}}" bindinput="onNote" placeholder="{{s.approval.note}}" />
+      <view wx:if="{{err}}" class="ap-err">{{err}}</view>
+      <view class="ap-actions">
+        <button class="btn btn-ember btn-sm" hover-class="btn-hover" disabled="{{busy}}" bindtap="approve">✓ {{s.approval.approve}}</button>
+        <button class="btn btn-ghost btn-sm" hover-class="btn-hover" disabled="{{busy}}" bindtap="decline">{{s.approval.decline}}</button>
+      </view>
+    </block>
+    <view wx:else class="ap-waiting">⏱ {{v.waiting}}</view>
+  </block>
+  <view wx:else class="ap-result {{v.status}}">{{v.result}}</view>
+</view>

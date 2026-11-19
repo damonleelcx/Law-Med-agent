@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/cases/cases",
+    "pages/docs/docs",
+    "pages/me/me",
+    "pages/chat/chat",
+    "pages/case/case",
+    "pages/doc/doc",
+    "pages/approvals/approvals",
+    "pages/stamps/stamps",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarTitleText": "维拉",
+    "navigationBarBackgroundColor": "@navBg",
+    "navigationBarTextStyle": "@navText",
+    "backgroundColor": "@pageBg",
+    "backgroundTextStyle": "@bgText"
+  },
+  "tabBar": {
+    "color": "@tabText",
+    "selectedColor": "@tabSelected",
+    "backgroundColor": "@tabBg",
+    "borderStyle": "@tabBorder",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "对话" },
+      { "pagePath": "pages/cases/cases", "text": "案件" },
+      { "pagePath": "pages/docs/docs", "text": "文件" },
+      { "pagePath": "pages/me/me", "text": "我的" }
+    ]
+  },
+  "usingComponents": {
+    "login-sheet": "/components/login-sheet/login-sheet",
+    "goal-card": "/components/goal-card/goal-card",
+    "approval-card": "/components/approval-card/approval-card"
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,103 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view wx:if="{{!signedIn}}" class="empty-card" bindtap="signIn">
+      <image src="/images/vera-face-think.webp" webp mode="aspectFill" />
+      <text>{{s.loginToSeeCases}}</text>
+    </view>
+    <view wx:elif="{{err}}" class="attn">{{err}}</view>
+    <view wx:elif="{{!g}}" class="muted">{{s.loading}}</view>
+
+    <block wx:else>
+      <!-- Header -->
+      <text class="meta">{{g.meta}}</text>
+      <view class="h1 title">{{g.title}}</view>
+      <text class="pill pill-{{g.status}}">{{g.statusLabel}}</text>
+
+      <view class="actions">
+        <button wx:if="{{g.conversation}}" class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="chat">💬 {{s.vera}}</button>
+        <button wx:if="{{g.canPause}}" class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="pause">❚❚ {{s.goal.pause}}</button>
+        <button wx:if="{{g.canResume}}" class="btn btn-ember btn-sm" hover-class="btn-hover" bindtap="resume">▶ {{s.goal.resume}}</button>
+        <button wx:if="{{g.canCancel}}" class="btn btn-danger btn-sm" hover-class="btn-hover" bindtap="cancel">✕ {{s.goal.cancel}}</button>
+      </view>
+
+      <view wx:if="{{g.needsAttention}}" class="attn block">
+        <text>!</text>
+        <view><view class="attn-title">{{s.goal.attention}}</view><view>{{g.attention}}</view></view>
+      </view>
+
+      <view wx:for="{{approvals}}" wx:key="id" class="block">
+        <approval-card a="{{item}}" bind:done="onApprovalDone" />
+      </view>
+
+      <!-- Plan / timeline / files -->
+      <view class="seg block">
+        <view class="seg-item {{tab === 'plan' ? 'on' : ''}}" data-tab="plan" bindtap="setTab">{{s.goal.plan}}</view>
+        <view class="seg-item {{tab === 'timeline' ? 'on' : ''}}" data-tab="timeline" bindtap="setTab">{{s.goal.timeline}}</view>
+        <view class="seg-item {{tab === 'files' ? 'on' : ''}}" data-tab="files" bindtap="setTab">{{s.goal.files}}</view>
+      </view>
+
+      <view wx:if="{{tab === 'plan'}}" class="plan">
+        <view wx:for="{{tasks}}" wx:key="id" class="plan-item st-{{item.status}}">
+          <view class="ti ti-{{item.icon}}">{{item.glyph}}</view>
+          <view class="plan-body">
+            <view class="plan-row"><text class="plan-title">{{item.title}}</text><text class="plan-label">{{item.label}}</text></view>
+            <text wx:if="{{item.activity}}" class="activity {{item.activity.recovering ? 'recovering' : ''}}">{{item.activity.text}}</text>
+            <view wx:if="{{item.short}}" class="plan-sum" data-id="{{item.id}}" bindtap="toggle">
+              <view wx:if="{{open[item.id]}}" class="prose"><rich-text nodes="{{item.html}}" user-select /></view>
+              <text wx:else class="plan-short">{{item.short}}</text>
+            </view>
+            <text wx:if="{{item.error}}" class="plan-err">{{item.error}}</text>
+            <text wx:if="{{item.wait}}" class="muted plan-wait">{{item.wait}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{tab === 'timeline'}}" class="timeline">
+        <view wx:for="{{summaries}}" wx:key="key" class="tl-summary"><text class="muted">{{s.goal.earlier}}</text><view>{{item.text}}</view></view>
+        <view wx:for="{{events}}" wx:key="key" class="ev ev-{{item.kind}} {{item.bad ? 'bad' : ''}}">
+          <view class="ev-dot" />
+          <view class="ev-body">
+            <view class="ev-head"><text class="ev-label">{{item.label}}</text><text class="muted ev-at">{{item.at}}</text></view>
+            <text wx:if="{{item.detail}}" class="ev-detail">{{item.detail}}</text>
+            <text wx:if="{{item.why}}" class="ev-why">{{item.why}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:if="{{tab === 'files'}}">
+        <view wx:if="{{!docs.length}}" class="muted">{{s.docs.empty}}</view>
+        <view wx:for="{{docs}}" wx:key="id" class="file-row" hover-class="row-hover" data-id="{{item.id}}" bindtap="openDoc">
+          <view class="fr-icon">▤</view>
+          <view class="fr-text"><text class="fr-title">{{item.title}}</text><text class="fr-sub">{{item.sub}}</text></view>
+        </view>
+      </view>
+
+      <!-- Side panel on the web: next, reminders, criteria, usage -->
+      <view class="section">{{s.goal.next}}</view>
+      <view class="card card-pad">
+        <view wx:if="{{!next.length}}" class="muted">{{s.goal.nothingNext}}</view>
+        <view wx:for="{{next}}" wx:key="key" class="next-row"><view class="ti ti-{{item.icon}}">{{item.glyph}}</view><text>{{item.title}}</text></view>
+      </view>
+
+      <block wx:if="{{reminders.length}}">
+        <view class="section">{{s.goal.reminders}}</view>
+        <view class="card card-pad">
+          <view wx:for="{{reminders}}" wx:key="key" class="rem-row"><text class="muted rem-at">{{item.at}}</text><text>{{item.text}}</text></view>
+        </view>
+      </block>
+
+      <view class="section">{{s.goal.criteria}}</view>
+      <view class="card card-pad">
+        <view wx:for="{{g.criteria}}" wx:key="*this" class="crit">· {{item}}</view>
+      </view>
+
+      <view class="section">{{s.goal.usage}}</view>
+      <view class="card card-pad usage">
+        <view><text class="u-n">{{g.steps}}</text> {{s.goal.steps}}</view>
+        <view><text class="u-n">{{g.tools}}</text> {{s.goal.tools}}</view>
+        <view><text class="u-n">{{g.cost}}</text> {{s.goal.cost}}</view>
+      </view>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>
