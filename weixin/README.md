@@ -86,8 +86,12 @@ Guarantees, enforced by the `stamp_ledger` table (migration `0003_wechat.sql`):
 ## Set it up
 
 1. **Mini program console** (mp.weixin.qq.com)
-   - 开发管理 → 服务器域名 → request合法域名: your ACT origin
-     (`https://act.heros-agent.space`).
+   - 开发管理 → 服务器域名 → request合法域名: the mainland China copy,
+     `https://vera.zhiyuwujie.top` (Alibaba Cloud, `deploy/cn`). Mini programs
+     can only call ICP-filed domains, so the US copy (`act.heros-agent.space`)
+     cannot be used. The same domain serves the live updates (`/api/stream`),
+     uploads (uploadFile合法域名) and export downloads (downloadFile合法域名);
+     add it under those lists too.
    - 虚拟支付 → enable it, create the **代币** (coin) product, set the price of
      one coin, and note the **OfferID** and **AppKey** (the sandbox has its own
      AppKey).
@@ -101,8 +105,10 @@ Guarantees, enforced by the `stamp_ledger` table (migration `0003_wechat.sql`):
    | `ACT_WX_PAY_APPKEY` | virtual payment AppKey (production or sandbox, matching `ACT_WX_PAY_ENV`) |
    | `ACT_WX_PAY_ENV` | `0` production, `1` sandbox |
 
-   In k8s these come from the optional `act-wechat` secret
-   (`deploy/k8s/10-secrets.yaml`, Secrets Manager key `act/wechat`).
+   On the Aliyun server they go in with `deploy/cn/secrets.sh` (export the
+   `ACT_WX_*` values before running it). On the US k8s copy they come from the
+   optional `act-wechat` secret (`deploy/k8s/10-secrets.yaml`, Secrets Manager
+   key `act/wechat`).
 3. **This folder**: put your AppID in `project.config.json`, check
    `API_BASE` in `utils/config.js`, open the folder in WeChat DevTools
    (微信开发者工具), and upload.
