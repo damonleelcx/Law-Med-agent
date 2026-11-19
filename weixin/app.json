@@ -24,10 +24,10 @@
     "backgroundColor": "@tabBg",
     "borderStyle": "@tabBorder",
     "list": [
-      { "pagePath": "pages/index/index", "text": "对话" },
-      { "pagePath": "pages/cases/cases", "text": "案件" },
-      { "pagePath": "pages/docs/docs", "text": "文件" },
-      { "pagePath": "pages/me/me", "text": "我的" }
+      { "pagePath": "pages/index/index", "text": "对话", "iconPath": "@tab_chat", "selectedIconPath": "@tab_chat_on" },
+      { "pagePath": "pages/cases/cases", "text": "案件", "iconPath": "@tab_case", "selectedIconPath": "@tab_case_on" },
+      { "pagePath": "pages/docs/docs", "text": "文件", "iconPath": "@tab_doc", "selectedIconPath": "@tab_doc_on" },
+      { "pagePath": "pages/me/me", "text": "我的", "iconPath": "@tab_me", "selectedIconPath": "@tab_me_on" }
     ]
   },
   "usingComponents": {

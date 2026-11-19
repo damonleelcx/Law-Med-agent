@@ -7,7 +7,15 @@
     "tabText": "#6f675d",
     "tabSelected": "#e8662a",
     "tabBg": "#f6eee2",
-    "tabBorder": "white"
+    "tabBorder": "white",
+    "tab_chat": "images/tab/chat-light.png",
+    "tab_chat_on": "images/tab/chat-light-on.png",
+    "tab_case": "images/tab/case-light.png",
+    "tab_case_on": "images/tab/case-light-on.png",
+    "tab_doc": "images/tab/doc-light.png",
+    "tab_doc_on": "images/tab/doc-light-on.png",
+    "tab_me": "images/tab/me-light.png",
+    "tab_me_on": "images/tab/me-light-on.png"
   },
   "dark": {
     "navBg": "#15130f",
@@ -17,6 +25,14 @@
     "tabText": "#9a8f80",
     "tabSelected": "#f08a4f",
     "tabBg": "#1b1814",
-    "tabBorder": "black"
+    "tabBorder": "black",
+    "tab_chat": "images/tab/chat-dark.png",
+    "tab_chat_on": "images/tab/chat-dark-on.png",
+    "tab_case": "images/tab/case-dark.png",
+    "tab_case_on": "images/tab/case-dark-on.png",
+    "tab_doc": "images/tab/doc-dark.png",
+    "tab_doc_on": "images/tab/doc-dark-on.png",
+    "tab_me": "images/tab/me-dark.png",
+    "tab_me_on": "images/tab/me-dark-on.png"
   }
 }

@@ -164,6 +164,11 @@ page {
   font-size: 26rpx;
   display: inline-flex;
   width: auto !important;
+  /* WeChat's <button> centres itself with auto side margins; inside a row
+     (page heads, settings rows, card actions) it must sit where the flex
+     layout puts it, e.g. 上传 at the right of 文件. */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 .btn-ember {
   background: var(--ember-500);

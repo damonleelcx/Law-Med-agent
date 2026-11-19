@@ -67,6 +67,11 @@ page({
       return Promise.all(mine.slice(0, 6).map((g) => api.get('/api/goals/' + g.id).catch(() => g))).then((detailed) => {
         if (this.data.sending) return
         const messages = list.map(row)
+        // A message refused before it was stored (out of stamps: 402) exists
+        // only here. Keep it, with its 重试, across reloads — e.g. coming back
+        // from buying stamps — unless the server has it after all.
+        const stored = new Set(list.filter((m) => m.role === 'user').map((m) => m.content))
+        this.data.messages.filter((m) => m.failed && !stored.has(m.content)).forEach((m) => messages.push(m))
         // Cases appear after the message that opened them.
         const placed = new Set()
         messages.forEach((m) => {

@@ -153,6 +153,7 @@ const en = {
     verifyBanner: 'Confirm your email to start talking with Vera.', verifyAction: 'Resend link',
     live: 'Live', offline: 'Reconnecting…', copy: 'Copy', copied: 'Copied',
     emergency: 'Emergency guidance shown',
+    aiLabel: 'AI-generated',
   },
   goal: {
     status: { planning: 'Planning', active: 'In progress', paused: 'Paused', needs_attention: 'Needs you', completed: 'Completed', failed: 'Stopped', cancelled: 'Cancelled' },
@@ -349,6 +350,7 @@ const zh: Dict = {
     verifyBanner: '请先确认邮箱，再开始与维拉对话。', verifyAction: '重新发送链接',
     live: '实时', offline: '正在重新连接…', copy: '复制', copied: '已复制',
     emergency: '已显示紧急指引',
+    aiLabel: 'AI 生成',
   },
   goal: {
     status: { planning: '规划中', active: '进行中', paused: '已暂停', needs_attention: '需要你', completed: '已完成', failed: '已停止', cancelled: '已取消' },

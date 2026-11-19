@@ -26,7 +26,7 @@
       </view>
 
       <view wx:for="{{approvals}}" wx:key="id" class="block">
-        <approval-card a="{{item}}" bind:done="onApprovalDone" />
+        <approval-card class="approval-card" a="{{item}}" bind:done="onApprovalDone" />
       </view>
 
       <!-- Plan / timeline / files -->

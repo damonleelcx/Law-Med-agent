@@ -22,6 +22,9 @@ module.exports = {
   copy: '复制',
   copied: '已复制',
   emergency: '已显示紧急指引',
+  // Every reply Vera writes is marked as AI-generated (AI 生成), as mainland
+  // rules on labelling AI-generated content require.
+  aiLabel: 'AI 生成',
   disclaimer: '维拉是 AI 助手，凡需执照的事项由持证专业人士审阅。紧急情况请拨打 120。',
   caseOpened: '已建立案件',
   viewCase: '查看案件',

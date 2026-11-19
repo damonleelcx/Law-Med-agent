@@ -11,12 +11,12 @@
         <text>{{s.approval.none}}</text>
       </view>
       <view class="list">
-        <approval-card wx:for="{{own}}" wx:key="id" a="{{item}}" bind:done="onDone" />
+        <approval-card class="approval-card" wx:for="{{own}}" wx:key="id" a="{{item}}" bind:done="onDone" />
       </view>
       <block wx:if="{{licensed}}">
         <view class="section">{{s.approval.queue}}</view>
         <view class="list">
-          <approval-card wx:for="{{queue}}" wx:key="id" a="{{item}}" bind:done="onDone" />
+          <approval-card class="approval-card" wx:for="{{queue}}" wx:key="id" a="{{item}}" bind:done="onDone" />
         </view>
         <view wx:if="{{!queue.length}}" class="muted">{{s.approval.none}}</view>
       </block>
