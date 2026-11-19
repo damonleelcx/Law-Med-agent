@@ -407,6 +407,22 @@ export const icp = document.querySelector('meta[name="act-icp"]')?.getAttribute(
 // Its telecom operating licence (增值电信业务经营许可证), shown beside it.
 export const icpLicence = document.querySelector('meta[name="act-icp-licence"]')?.getAttribute('content') || ''
 
+// The China copy shows mainland numbers and wording only: no 911, 988 or US
+// states. The emergency text Vera sends is switched the same way on the server
+// (internal/tools/redflags.go).
+if (region === 'cn') {
+  zh.faq.items[3] = ['遇到紧急情况怎么办？', '请立即拨打 120 急救电话。只要你向维拉描述紧急情况，她首先就会这样告诉你。']
+  zh.footer.disclaimer = 'ACT 提供信息与协助。在持证专业人士审阅之前，本站内容均不构成法律或医疗意见。紧急情况请拨打 120。'
+  zh.app.disclaimer = '维拉是 AI 助手，凡需执照的事项由持证专业人士审阅。紧急情况请拨打 120。'
+  zh.settings.jurisdiction = '所在地（省 / 市）'
+  zh.settings.memoryHint = '例如你所在的城市、过敏史或正在服用的药物——免得你重复说明。'
+  en.faq.items[3] = ['What if it’s an emergency?', 'Call 120 right away. If you describe an emergency to Vera, that is the first thing she will tell you.']
+  en.footer.disclaimer = 'ACT provides information and assistance. Nothing here is legal or medical advice until it has been reviewed by a licensed professional. In an emergency, call 120.'
+  en.app.disclaimer = 'Vera is an AI assistant. Licensed professionals review anything that needs a licence. In an emergency call 120.'
+  en.settings.jurisdiction = 'Where you live (province / city)'
+  en.settings.memoryHint = 'Things like your city, allergies or medications — so you don’t repeat yourself.'
+}
+
 function initialLang(): Lang {
   try {
     const s = localStorage.getItem('act.lang')
