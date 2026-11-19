@@ -125,6 +125,9 @@ require('./lib')
     return 'tapped "' + t + '" → sent and answered'
   })
 
+  await mock.grant(20)
+  await require('./voice')() // hold-to-talk, cancel, spoken answers, 朗读
+
   let goalId = '', apId = ''
 
   await step('Setup: sign in from 对话, two chats via devmock, a seeded case with a pending 发送邮件 approval', async () => {

@@ -128,6 +128,20 @@ func (m *Model) Stream(ctx context.Context, meta CallMeta, req llm.Request, onDe
 	return resp, err
 }
 
+// Metered runs a model call that is not a chat completion (speech) under the
+// same daily budgets, and records the tokens it reports.
+func (m *Model) Metered(ctx context.Context, meta CallMeta, model string, call func() (tokens int, err error)) error {
+	if err := m.preflight(ctx, meta); err != nil {
+		return err
+	}
+	start := time.Now()
+	n, err := call()
+	resp := &llm.Response{Model: model, Latency: time.Since(start)}
+	resp.Usage.PromptTokens = n
+	m.record(ctx, meta, model, resp, err)
+	return err
+}
+
 func (m *Model) preflight(ctx context.Context, meta CallMeta) error {
 	if meta.GoalID != "" {
 		g, err := m.Store.Goal(ctx, meta.GoalID)

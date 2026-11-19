@@ -12,6 +12,9 @@
 # which uses the China copy's real model (Hunyuan on Tencent TokenHub, as in
 # deploy/cn/20-config.yaml). The key is
 # handed to the container by name only: never on a command line, never printed.
+#
+# Voice (mic and 朗读) always uses devmock here: real speech recognition fetches
+# the recording from the server's public URL, which 127.0.0.1 is not.
 param([string]$KeyFile = '', [string]$KeyName = 'ACT_LLM_API_KEY')
 #
 # Native tools report through exit codes; Windows PowerShell 5.1 would turn
@@ -66,6 +69,7 @@ docker run -d --name act-wx-server --network $net -p 127.0.0.1:8080:8080 -v "${r
   -e ACT_ADDR=':8080' -e ACT_PUBLIC_ORIGIN='http://127.0.0.1:8080' -e ACT_COOKIE_SECURE=false -e ACT_REGION=cn `
   @model -e ACT_WORKERS=1 -e ACT_WX_API_BASE='http://act-wx-mock:8090' -e ACT_WX_APPID=touristappid -e ACT_WX_APPSECRET=devmock `
   -e ACT_WX_OFFER_ID=devmock-offer -e ACT_WX_PAY_APPKEY=dev-appkey -e ACT_WX_PAY_ENV=1 `
+  -e ACT_SPEECH_BASE_URL=http://act-wx-mock:8090/v1 -e ACT_ASR_MODEL=devmock-asr -e ACT_TTS_MODEL=devmock-tts `
   golang:1.26 /app/act serve | Out-Null
 
 Write-Host 'ACT on http://127.0.0.1:8080, devmock on http://127.0.0.1:8090 — Ctrl-C stops both'

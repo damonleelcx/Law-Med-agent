@@ -176,6 +176,50 @@ function upload(filePath, name, retried) {
   })
 }
 
+// transcribe sends a recording to /api/voice/transcribe and resolves with
+// the text it heard.
+function transcribe(filePath, retried) {
+  const tok = token()
+  if (!tok) return Promise.reject(needLogin())
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: API_BASE + '/api/voice/transcribe',
+      filePath,
+      name: 'file',
+      header: { 'X-ACT': '1', Authorization: 'Bearer ' + tok },
+      success: (res) => {
+        let data = {}
+        try {
+          data = JSON.parse(res.data)
+        } catch (e) {}
+        if (res.statusCode === 200) return resolve(data.text || '')
+        if (!retried && res.statusCode === 401) {
+          return login()
+            .then(() => transcribe(filePath, true))
+            .then(resolve, reject)
+        }
+        reject(apiError(res.statusCode, data))
+      },
+      fail: (err) => reject(Object.assign(new Error(err.errMsg || 'network error'), { status: 0 })),
+    })
+  })
+}
+
+// audio fetches an authenticated GET (a reply read aloud) into a temp file —
+// not USER_DATA_PATH, so replies do not pile up in the 10 MB of user files.
+function audio(path) {
+  const tok = token()
+  if (!tok) return Promise.reject(needLogin())
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: API_BASE + path,
+      header: { 'X-ACT': '1', Authorization: 'Bearer ' + tok },
+      success: (res) => (res.statusCode === 200 ? resolve(res.tempFilePath) : reject(apiError(res.statusCode, {}))),
+      fail: (err) => reject(Object.assign(new Error(err.errMsg || 'network error'), { status: 0 })),
+    })
+  })
+}
+
 // download saves an authenticated GET to a local temp file (for sharing).
 function download(path, fileName) {
   const tok = token()
@@ -200,6 +244,8 @@ module.exports = {
   stream,
   upload,
   download,
+  transcribe,
+  audio,
   get: (p) => request('GET', p),
   post: (p, d) => request('POST', p, d || {}),
   put: (p, d) => request('PUT', p, d || {}),

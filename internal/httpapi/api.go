@@ -64,7 +64,7 @@ func (s *Server) getSettings(w http.ResponseWriter, r *http.Request, u *auth.Use
 		}
 		rows.Close()
 	}
-	writeJSON(w, 200, map[string]any{"user": s.view(r, u), "preferences": json.RawMessage(prefs), "licenses": lic})
+	writeJSON(w, 200, map[string]any{"user": s.view(r, u), "preferences": json.RawMessage(prefs), "licenses": lic, "voice": s.voiceFeatures()})
 }
 
 func (s *Server) putSettings(w http.ResponseWriter, r *http.Request, u *auth.User) {

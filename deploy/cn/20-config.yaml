@@ -25,6 +25,13 @@ data:
   ACT_LLM_MODEL: "hy4"
   ACT_LLM_FAST_MODEL: "hy4-flash"
 
+  # Voice, on the same TokenHub key: hold-to-talk in the mini program (speech
+  # recognition fetches the recording from ACT_PUBLIC_ORIGIN) and Vera's
+  # replies read aloud. Both are billed per token (按量付费); "" turns one off.
+  ACT_ASR_MODEL: "hy-asr-3.0-preview"
+  ACT_TTS_MODEL: "tenlai-tts-v1.0"
+  ACT_TTS_VOICE: "603002" # 软萌心心
+
   # Mail: none, as on suki.zhiyuwujie.top (MAIL_DISABLED: verification and
   # reset links are logged, not sent; WeChat sign-in is the working path). The
   # published address support@zhiyuwujie.top only receives: the domain's MX is

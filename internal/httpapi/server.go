@@ -25,6 +25,7 @@ import (
 	"github.com/damonleelcx/Law-Med-agent/internal/auth"
 	"github.com/damonleelcx/Law-Med-agent/internal/engine"
 	"github.com/damonleelcx/Law-Med-agent/internal/persona"
+	"github.com/damonleelcx/Law-Med-agent/internal/speech"
 	"github.com/damonleelcx/Law-Med-agent/internal/tools"
 	"github.com/damonleelcx/Law-Med-agent/internal/wechat"
 )
@@ -49,6 +50,13 @@ type Server struct {
 	Region     string
 	ICPBeian   string
 	ICPLicence string
+
+	// Voice in/out (internal/speech). Speech nil or without models: off.
+	// PublicOrigin is where the speech service fetches recordings from.
+	Speech       *speech.Client
+	PublicOrigin string
+	clips        clipStore
+	speechCache  speechCache
 
 	limiter *limiter
 }
@@ -125,6 +133,11 @@ func (s *Server) Handler() http.Handler {
 	m.HandleFunc("POST /api/wx/stamps/order", s.limit("wxorder", 20, s.authed(s.wxOrder)))
 
 	m.HandleFunc("GET /api/stream", s.authed(s.stream))
+
+	// Voice: speech to text for the message box, Vera's replies read aloud.
+	m.HandleFunc("POST /api/voice/transcribe", s.limit("voice", 20, s.verified(s.transcribe)))
+	m.HandleFunc("GET /api/voice/clip/{name}", s.voiceClip)
+	m.HandleFunc("GET /api/messages/{id}/speech", s.limit("speak", 30, s.verified(s.speak)))
 
 	m.Handle("/", s.spa())
 	return s.middleware(m)
