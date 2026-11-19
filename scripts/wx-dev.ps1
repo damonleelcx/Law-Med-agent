@@ -9,7 +9,8 @@
 #
 # Vera's replies come from devmock unless a model key is given, e.g.
 #   .\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName HUNYUAN_LLM_API_KEY
-# which uses the real model (ACT's default base URL and models). The key is
+# which uses the China copy's real model (Hunyuan on Tencent TokenHub, as in
+# deploy/cn/20-config.yaml). The key is
 # handed to the container by name only: never on a command line, never printed.
 param([string]$KeyFile = '', [string]$KeyName = 'ACT_LLM_API_KEY')
 #
@@ -51,7 +52,8 @@ if ($KeyFile) {
   $line = Get-Content -LiteralPath $KeyFile | Where-Object { $_ -match "^\s*(export\s+)?$KeyName\s*=" } | Select-Object -First 1
   if (-not $line) { Write-Host "$KeyName not found in $KeyFile"; exit 1 }
   $env:ACT_LLM_API_KEY = ($line -split '=', 2)[1].Trim().Trim('"').Trim("'")
-  $model = @('-e', 'ACT_LLM_API_KEY')   # value comes from this process's environment
+  $model = @('-e', 'ACT_LLM_API_KEY',   # value comes from this process's environment
+    '-e', 'ACT_LLM_BASE_URL=https://tokenhub.tencentmaas.com/v1', '-e', 'ACT_LLM_MODEL=hy4', '-e', 'ACT_LLM_FAST_MODEL=hy4-flash')
   Write-Host "model: real ($KeyName from $KeyFile)"
 } else {
   $model = @('-e', 'ACT_LLM_BASE_URL=http://act-wx-mock:8090/v1', '-e', 'ACT_LLM_API_KEY=devmock',

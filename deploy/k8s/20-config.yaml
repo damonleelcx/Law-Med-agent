@@ -8,11 +8,11 @@ data:
   ACT_ADDR: ":8080"
   ACT_PUBLIC_ORIGIN: "https://act.heros-agent.space"
   ACT_COOKIE_SECURE: "true"
-  # Hunyuan on Tencent Cloud TokenHub (mainland China), OpenAI-compatible. The
-  # key is ACT_LLM_API_KEY in the act/prod secret.
-  ACT_LLM_BASE_URL: "https://tokenhub.tencentmaas.com/v1"
-  ACT_LLM_MODEL: "hy4"
-  ACT_LLM_FAST_MODEL: "hy4-flash"
+  # Same prepaid token-plan host as forge/jobs; the key is issued against it.
+  # Only the China copy (deploy/cn) uses Hunyuan.
+  ACT_LLM_BASE_URL: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+  ACT_LLM_MODEL: "qwen3.8-max"
+  ACT_LLM_FAST_MODEL: "qwen3.8-flash"
   # The relay presents a certificate for this name; the pod resolves it to the
   # relay's pinned ClusterIP via hostAliases (see 30-deploy.yaml).
   ACT_SMTP_HOST: "mail.heros-agent.space"
