@@ -1,31 +1,60 @@
-<view class="page">
-  <view wx:if="{{stampsEnabled && balance !== null}}" class="bar" bindtap="stamps">
+<view class="root {{ui}} chat">
+  <view wx:if="{{signedIn && stampsEnabled && balance !== null}}" class="bar" bindtap="stamps">
     <view class="chip">✉ {{balance}} · {{s.perMessage}}</view>
   </view>
 
-  <scroll-view class="log" scroll-y scroll-into-view="{{bottom}}" scroll-with-animation enhanced show-scrollbar="{{false}}">
-    <block wx:for="{{messages}}" wx:key="key">
-      <view wx:if="{{item.role === 'event'}}" class="sys"><text>{{item.content}}</text></view>
-
-      <view wx:elif="{{item.role === 'user'}}" class="msg me">
-        <view wx:if="{{item.failed}}" class="fail" data-i="{{index}}" bindtap="retry">!</view>
-        <view class="bubble bubble-me"><text user-select>{{item.content}}</text></view>
+  <scroll-view class="scroll" scroll-y scroll-into-view="{{bottom}}" scroll-with-animation enhanced show-scrollbar="{{false}}">
+    <!-- Empty: Vera's portrait, greeting and the web app's suggestions. -->
+    <view wx:if="{{!messages.length}}" class="empty">
+      <view class="portrait"><image src="/images/vera-portrait.webp" webp mode="aspectFill" /></view>
+      <view class="hello">{{s.greeting}}</view>
+      <view class="hello-sub">{{s.greetingSub}}</view>
+      <view class="suggest">
+        <view wx:for="{{s.suggestions}}" wx:key="*this" class="chip-btn" hover-class="chip-btn-hover" data-text="{{item}}" bindtap="suggest">{{item}}</view>
       </view>
+    </view>
 
-      <view wx:else class="msg vera">
-        <image class="avatar" src="/images/vera.webp" webp mode="aspectFill" />
-        <view class="bubble bubble-vera">
-          <text wx:if="{{item.content}}" user-select>{{item.content}}</text>
-          <view wx:else class="dots"><view /><view /><view /></view>
+    <view wx:else class="thread">
+      <block wx:for="{{messages}}" wx:key="key">
+        <view wx:if="{{item.role === 'user'}}" class="msg user">
+          <view wx:if="{{item.failed}}" class="fail" data-i="{{index}}" bindtap="retry">!</view>
+          <view class="bubble"><text user-select>{{item.content}}</text></view>
         </view>
+
+        <view wx:else class="msg vera {{item.emergency ? 'emergency' : ''}} {{item.update ? 'update' : ''}}">
+          <image class="vface {{item.pending ? 'pulse' : ''}} face"
+            src="/images/vera-face-{{item.complete ? 'laugh' : (item.pending ? 'think' : mood)}}.webp" webp mode="aspectFill" />
+          <view class="body">
+            <view class="name">
+              {{s.vera}}
+              <view wx:if="{{item.emergency}}" class="em-tag"><image src="/images/alert.svg" />{{s.emergency}}</view>
+            </view>
+            <view wx:if="{{item.pending && !item.content}}" class="typing"><view /><view /><view /></view>
+            <view wx:else class="prose"><rich-text nodes="{{item.html}}" user-select /></view>
+            <view wx:if="{{!item.pending && item.content}}" class="copy" data-i="{{index}}" bindtap="copy">{{s.copy}}</view>
+          </view>
+        </view>
+
+        <!-- A case appears after the message that opened it, and follows its plan live. -->
+        <goal-card wx:for="{{item.goals}}" wx:for-item="g" wx:key="id" goal="{{g}}" />
+      </block>
+      <goal-card wx:for="{{tail}}" wx:key="id" goal="{{item}}" />
+      <view wx:for="{{approvals}}" wx:key="id" class="ap-wrap">
+        <approval-card a="{{item}}" bind:done="onApprovalDone" />
       </view>
-    </block>
+    </view>
     <view id="end" class="end" />
   </scroll-view>
 
-  <view class="composer">
-    <textarea class="input" value="{{input}}" bindinput="onInput" auto-height maxlength="12000" cursor-spacing="16"
-      show-confirm-bar="{{false}}" placeholder="{{s.placeholder}}" confirm-type="send" bindconfirm="send" />
-    <button class="send btn-primary" size="mini" disabled="{{sending || !input}}" bindtap="send">{{s.send}}</button>
+  <view class="composer-wrap">
+    <view wx:if="{{upload}}" class="upload-note">{{upload}}</view>
+    <view class="composer">
+      <view class="attach" bindtap="attach"><image src="/images/clip.svg" /></view>
+      <textarea class="box" value="{{input}}" bindinput="onInput" auto-height maxlength="12000" cursor-spacing="24"
+        show-confirm-bar="{{false}}" placeholder="{{s.placeholder}}" placeholder-class="ph" confirm-type="send" bindconfirm="sendInput" />
+      <view class="send {{sending || !input ? 'off' : ''}}" bindtap="sendInput"><image src="/images/send.svg" /></view>
+    </view>
+    <view class="note">{{s.disclaimer}}</view>
   </view>
+  <login-sheet id="login" bind:login="onLogin" />
 </view>

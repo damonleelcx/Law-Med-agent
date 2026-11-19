@@ -1,21 +1,45 @@
 # ACT · Vera — WeChat mini program (微信小程序)
 
-The WeChat client for Vera: WeChat sign-in, chat that streams like the web
-app, and **stamps** (邮票) bought with WeChat virtual payment. **Sending one
-message costs 1 stamp.**
+Everything the web app does, inside WeChat, in **简体中文 only**: chat with
+Vera, cases with live plans, approvals, documents and uploads, and every
+setting. It uses the web app's design (cream, ink and ember, light and dark),
+Vera's portrait and her three moods, and the same server and soul. On top:
+WeChat sign-in, and **stamps** (邮票) bought with WeChat virtual payment.
+**Sending one message costs 1 stamp.**
 
 ```
 weixin/
-  app.js / app.json / app.wxss   shell, tab bar (Chats · Stamps), WeChat palette
-  utils/config.js                API_BASE and the stamp packs offered
-  utils/api.js                   wx.login sign-in, bearer token, silent re-login, streaming
-  utils/sse.js                   chunk → UTF-8 → server-sent events
-  pages/index                    conversation list (会话列表)
-  pages/chat                     chat: green/white bubbles, live reply, tap "!" to resend
-  pages/stamps                   balance, packs, wx.requestVirtualPayment, recent use
+  app.js / app.json / app.wxss   shell, 4 tabs, design tokens + shared styles (from web/src/styles)
+  theme.json                     light/dark chrome (nav bar, tab bar)
+  utils/config.js                API_BASE (local server inside DevTools) and stamp packs
+  utils/api.js                   sign-in on request, bearer token, silent re-login, streaming, upload
+  utils/live.js                  /api/stream: "something changed" → pages refetch (web live.tsx)
+  utils/page.js                  page() wrapper: strings, signed-in state, theme, live, login sheet
+  utils/strings.js               the web app's 中文 dictionary
+  utils/md.js · fmt.js · ui.js   Markdown → rich-text, times/activity/timeline labels, appearance
+  components/login-sheet         the one place sign-in is asked for
+  components/goal-card           case card in the chat, follows its plan live (web GoalCard)
+  components/approval-card       同意 / 拒绝 with a note (web ApprovalCard)
 ```
 
+| Web app | Mini program |
+|---|---|
+| Sidebar: new chat, search, conversations | 对话 tab: new chat, search, archived; long-press → 重命名 / 归档 / 删除 |
+| Chat: streaming, Vera's moods, case cards, inline approvals, attach | pages/chat — attach takes a file from a WeChat chat or a photo |
+| Cases, case view (plan / timeline / files, next, reminders, criteria, usage, pause / resume / cancel) | 案件 tab, pages/case |
+| Documents, upload, document view, download | 文件 tab, pages/doc — 复制全文 / 发送到聊天 instead of download |
+| Approvals (own + professional queue) | pages/approvals, badge on 我的 |
+| Settings: profile, Vera, notifications, privacy & memory (export, delete), devices, limits, professional licence, appearance, admin | 我的 tab → pages/settings?tab=… — language is fixed to 简体中文; email toggles are off for WeChat accounts (no email) |
+| — | pages/stamps: balance, packs, recent use |
+
 ## How it works
+
+### Browse first, sign in when you act
+
+Nothing signs in at launch: every page opens signed out (WeChat's review rules
+expect that). The login sheet appears only when an action needs an account —
+sending a message, tapping a suggestion, opening your history, cases, files or
+settings, or buying stamps — and "暂不登录" keeps what was typed.
 
 ### Sign-in
 
@@ -83,15 +107,34 @@ Guarantees, enforced by the `stamp_ledger` table (migration `0003_wechat.sql`):
    `API_BASE` in `utils/config.js`, open the folder in WeChat DevTools
    (微信开发者工具), and upload.
 
+## Run it locally in WeChat DevTools
+
+`scripts/wx-dev.ps1` starts the whole stack in Docker: Postgres, ACT on
+`127.0.0.1:8080` (where the app points inside DevTools), and `cmd/devmock` on
+`8090`, a stand-in WeChat that accepts any login code, keeps a stamp balance
+(3 to start) and checks payment signatures like the real thing.
+
+```powershell
+.\scripts\wx-dev.ps1                                              # replies from devmock
+.\scripts\wx-dev.ps1 -KeyFile D:\.ENV -KeyName QWEN_LLM_API_KEY_V2  # replies from the real model
+curl.exe -X POST "http://127.0.0.1:8090/mock/grant?n=10"           # add stamps (the simulator cannot pay)
+```
+
+Open `weixin/` in DevTools. `project.config.json` uses the test AppID
+`touristappid`; `project.private.config.json` (not committed) turns off the
+request-domain check for the local server. The DevTools command line and
+automation need a real AppID.
+
 ## Notes
 
 - Use the sandbox (`ACT_WX_PAY_ENV=1` + sandbox AppKey) for testing purchases.
 - Virtual payment is subject to WeChat's platform rules (category
   qualification, iOS availability). The Stamps page shows WeChat's error if the
   payment sheet is refused.
-- Replies are Markdown on the server; bubbles show them as plain text with the
-  Markdown syntax stripped.
+- Uploads: `wx.uploadFile` names the file part after a temp path, so the app
+  sends the real name as form field `name`; the server keeps it when it is valid
+  UTF-8 and its extension matches the file sent.
 - Server tests: `internal/wechat/wechat_test.go` (signatures, token refresh,
   coin APIs against a fake WeChat) and `internal/httpapi/wechat_test.go`
-  (sign-in, bearer auth, charge once per message, refund, 402; needs
-  `ACT_TEST_DATABASE_URL`).
+  (sign-in, bearer auth, charge once per message, refund, 402, upload names,
+  passwordless delete for WeChat accounts; needs `ACT_TEST_DATABASE_URL`).

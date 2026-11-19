@@ -1,0 +1,34 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view class="h1">{{s.goal.title}}</view>
+
+    <view wx:if="{{!signedIn}}" class="empty-card top" bindtap="signIn">
+      <image src="/images/vera-face-think.webp" webp mode="aspectFill" />
+      <text>{{s.loginToSeeCases}}</text>
+    </view>
+
+    <block wx:else>
+      <view wx:if="{{goals === null}}" class="muted top">{{s.loading}}</view>
+      <view wx:elif="{{!goals.length}}" class="empty-card top">
+        <image src="/images/vera-face-think.webp" webp mode="aspectFill" />
+        <text>{{s.goal.none}}</text>
+      </view>
+      <view wx:else class="tiles">
+        <view wx:for="{{goals}}" wx:key="id" class="tile domain-{{item.domain}}" hover-class="row-hover" data-id="{{item.id}}" bindtap="open">
+          <view class="ct-top">
+            <text class="ct-domain">{{item.domainLabel}}</text>
+            <text class="pill pill-{{item.status}}">{{item.statusLabel}}</text>
+          </view>
+          <text class="ct-title">{{item.title}}</text>
+          <text wx:if="{{item.attention}}" class="ct-attn">{{item.attention}}</text>
+          <view class="gc-bar"><view style="width: {{item.pct}}%" /></view>
+          <view class="ct-foot">
+            <text>{{item.progress}}</text>
+            <text>{{item.when}} ↗</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

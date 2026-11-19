@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -734,6 +735,19 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request, u *auth.User) {
 		writeErr(w, 400, "could not read the file")
 		return
 	}
+	// The mini program uploads from a temp path (tmp_…pdf); it sends the
+	// file's real name alongside. The extension must match what was sent,
+	// since it decides how the text is extracted.
+	name := hdr.Filename
+	if n := strings.TrimSpace(r.FormValue("name")); n != "" && utf8.ValidString(n) && utf8.RuneCountInString(n) <= 200 &&
+		strings.EqualFold(filepath.Ext(n), filepath.Ext(hdr.Filename)) {
+		name = filepath.Base(strings.ReplaceAll(n, "\\", "/"))
+	}
+	if !utf8.ValidString(name) {
+		// A title Postgres would refuse; keep the extension, which decides extraction.
+		name = "upload" + filepath.Ext(name)
+	}
+	hdr.Filename = name
 	text, err := s.Agent.ExtractText(r.Context(), u.ID, hdr.Filename, data)
 	if err != nil {
 		writeErr(w, 400, err.Error())
@@ -746,6 +760,7 @@ func (s *Server) upload(w http.ResponseWriter, r *http.Request, u *auth.User) {
 	env := &tools.Env{Pool: s.Pool, UserID: u.ID}
 	id, ver, _, err := tools.SaveDocument(r.Context(), env, hdr.Filename, "upload", text)
 	if err != nil {
+		slog.Error("upload save", "err", err)
 		writeErr(w, 500, "could not save")
 		return
 	}

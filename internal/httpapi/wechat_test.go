@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/damonleelcx/Law-Med-agent/internal/agent"
 	"github.com/damonleelcx/Law-Med-agent/internal/auth"
 	"github.com/damonleelcx/Law-Med-agent/internal/db"
 	"github.com/damonleelcx/Law-Med-agent/internal/mail"
@@ -116,7 +118,7 @@ func TestWeChatLoginAndStamps(t *testing.T) {
 
 	wx := wechat.New(wechat.Config{AppID: "wxtest", AppSecret: "secret", OfferID: "1450000000", AppKey: "appkey"})
 	wx.BaseURL = wxSrv.URL
-	s := &Server{Pool: pool, Auth: &auth.Service{Pool: pool, Mailer: mail.Log{}, SessionTTL: time.Hour}, Hub: NewHub(),
+	s := &Server{Pool: pool, Auth: &auth.Service{Pool: pool, Mailer: mail.Log{}, SessionTTL: time.Hour}, Hub: NewHub(), Agent: &agent.Agent{},
 		WX: wx, Stamps: &wechat.Stamps{Pool: pool, WX: wx}}
 	h := s.Handler()
 
@@ -230,7 +232,58 @@ func TestWeChatLoginAndStamps(t *testing.T) {
 		t.Fatalf("email account was charged: %+v", c)
 	}
 	// Several WeChat accounts can coexist with an empty email.
-	if code, _ := call("POST", "/api/wx/login", "", map[string]string{"code": "code-bob-1"}); code != 200 {
+	code, bob := call("POST", "/api/wx/login", "", map[string]string{"code": "code-bob-1"})
+	if code != 200 {
 		t.Fatalf("second wechat account: %d", code)
+	}
+	bobToken := bob["token"].(string)
+
+	// wx.uploadFile names the part after its temp path; the real name comes
+	// alongside and is kept when its extension matches and it is valid UTF-8.
+	upload := func(name string) (int, map[string]any) {
+		var buf bytes.Buffer
+		mw := multipart.NewWriter(&buf)
+		fw, _ := mw.CreateFormFile("file", "tmp_9f2c1.txt")
+		fw.Write([]byte("租约第3条：押金5000元。"))
+		mw.WriteField("name", name)
+		mw.Close()
+		req := httptest.NewRequest("POST", "/api/documents", &buf)
+		req.Header.Set("X-ACT", "1")
+		req.Header.Set("Content-Type", mw.FormDataContentType())
+		req.Header.Set("Authorization", "Bearer "+bobToken)
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		var out map[string]any
+		_ = json.Unmarshal(rec.Body.Bytes(), &out)
+		return rec.Code, out
+	}
+	for _, c := range []struct{ name, want string }{
+		{"租约.txt", "租约.txt"},                   // the real name
+		{"../../etc/passwd.txt", "passwd.txt"}, // no paths
+		{"evil.pdf", "tmp_9f2c1.txt"},          // extension must match what was sent
+		{"bad\xff\xfe.txt", "tmp_9f2c1.txt"},   // not UTF-8 (Postgres would refuse it): ignored
+		{"", "tmp_9f2c1.txt"},
+	} {
+		if code, out := upload(c.name); code != 201 || out["title"] != c.want {
+			t.Errorf("upload name %q: %d %v, want title %q", c.name, code, out, c.want)
+		}
+	}
+
+	// A WeChat account has no password: deleting it needs only its session.
+	req = httptest.NewRequest("POST", "/api/account/delete", strings.NewReader(`{"password":""}`))
+	req.Header.Set("X-ACT", "1")
+	req.Header.Set("Authorization", "Bearer "+bobToken)
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+	if rec.Code != 200 {
+		t.Fatalf("wechat account delete: %d %s", rec.Code, rec.Body.String())
+	}
+	if code, _ := call("GET", "/api/auth/me", bobToken, nil); code != 401 {
+		t.Fatalf("deleted account still signed in: %d", code)
+	}
+	// An email account still needs its password.
+	webTok, _, _ := s.Auth.CreateSession(ctx, web.ID, "", "")
+	if code, _ := call("POST", "/api/account/delete", webTok, map[string]string{"password": ""}); code != 400 {
+		t.Fatalf("email account deleted without password: %d", code)
 	}
 }

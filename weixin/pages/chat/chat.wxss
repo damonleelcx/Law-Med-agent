@@ -1,141 +1,265 @@
-.page {
+/* After the web app's chat (web/src/styles/app.css: .chat, .msg, .composer). */
+.chat {
+  min-height: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 .bar {
-  padding: 12rpx 24rpx;
+  padding: 16rpx 32rpx 0;
   text-align: center;
 }
-.log {
+.scroll {
   flex: 1;
   min-height: 0;
-  padding: 16rpx 0;
 }
-.msg {
+.thread {
+  padding: 32rpx 28rpx 12rpx;
   display: flex;
-  align-items: flex-start;
-  padding: 16rpx 24rpx;
+  flex-direction: column;
+  gap: 44rpx;
 }
-.me {
+
+/* Empty state */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 80rpx 48rpx 24rpx;
+}
+.portrait {
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 64rpx;
+  overflow: hidden;
+  border: 8rpx solid var(--surface);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 44rpx;
+  animation: float 6s ease-in-out infinite;
+  background: var(--face-bg);
+}
+.portrait image {
+  width: 100%;
+  height: 100%;
+}
+.hello {
+  font-size: 52rpx;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin-bottom: 20rpx;
+}
+.hello-sub {
+  color: var(--text-2);
+  font-size: 30rpx;
+  line-height: 1.6;
+  margin-bottom: 52rpx;
+}
+.suggest {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20rpx;
+}
+.chip-btn {
+  border: 1rpx solid var(--line-strong);
+  background: var(--surface);
+  border-radius: 999rpx;
+  padding: 20rpx 32rpx;
+  font-size: 28rpx;
+}
+.chip-btn-hover {
+  border-color: var(--ember-500);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Messages */
+.msg.user {
+  display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 10rpx;
-  flex: none;
-  margin-right: 20rpx;
-  background: #dfe8e6;
-}
-.bubble {
-  max-width: 72%;
-  padding: 18rpx 24rpx;
-  border-radius: 10rpx;
-  line-height: 1.55;
-  font-size: 31rpx;
-  word-break: break-word;
+.msg.user .bubble {
+  font-size: var(--fs);
+  max-width: 82%;
+  background: var(--user-bubble);
+  color: var(--user-ink);
+  padding: 22rpx 30rpx;
+  border-radius: 40rpx 40rpx 12rpx 40rpx;
   white-space: pre-wrap;
-  position: relative;
-}
-.bubble-me {
-  background: var(--bubble-me);
-}
-.bubble-vera {
-  background: var(--bubble-vera);
-}
-/* The little tails WeChat bubbles have. */
-.bubble-me::after,
-.bubble-vera::before {
-  content: '';
-  position: absolute;
-  top: 26rpx;
-  border: 10rpx solid transparent;
-}
-.bubble-me::after {
-  right: -18rpx;
-  border-left-color: var(--bubble-me);
-}
-.bubble-vera::before {
-  left: -18rpx;
-  border-right-color: var(--bubble-vera);
+  word-break: break-word;
+  line-height: 1.55;
 }
 .fail {
   width: 40rpx;
   height: 40rpx;
   line-height: 40rpx;
   border-radius: 50%;
-  background: var(--danger);
+  background: var(--rose-500);
   color: #fff;
   text-align: center;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 700;
   margin-right: 16rpx;
+  flex: none;
 }
-.sys {
-  text-align: center;
-  padding: 12rpx 64rpx;
+.msg.vera {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
 }
-.sys text {
+.face {
+  width: 68rpx;
+  height: 68rpx;
+}
+.body {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text-2);
+  margin: 4rpx 0 8rpx;
+}
+.em-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #b3261e;
+  background: rgba(216, 72, 59, 0.12);
+  padding: 4rpx 16rpx;
+  border-radius: 99rpx;
+}
+.em-tag image {
+  width: 24rpx;
+  height: 24rpx;
+}
+.prose {
+  line-height: 1.68;
+  font-size: calc(var(--fs) + 1rpx);
+  word-break: break-word;
+}
+.msg.vera.emergency .prose {
+  background: rgba(216, 72, 59, 0.1);
+  border: 1rpx solid rgba(216, 72, 59, 0.3);
+  padding: 22rpx 26rpx;
+  border-radius: 28rpx;
+}
+.msg.vera.update .prose {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 32rpx;
+  padding: 22rpx 30rpx;
+}
+.copy {
   display: inline-block;
+  color: var(--text-3);
   font-size: 24rpx;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.18);
-  padding: 6rpx 16rpx;
-  border-radius: 8rpx;
+  padding: 8rpx 0;
 }
-.dots {
+.typing {
   display: flex;
   gap: 10rpx;
-  padding: 10rpx 4rpx;
+  padding: 22rpx 0;
 }
-.dots view {
-  width: 12rpx;
-  height: 12rpx;
+.typing view {
+  width: 14rpx;
+  height: 14rpx;
   border-radius: 50%;
-  background: #b2b2b2;
-  animation: blink 1.2s infinite both;
+  background: var(--ember-500);
+  animation: blink 1.2s infinite;
 }
-.dots view:nth-child(2) {
-  animation-delay: 0.2s;
+.typing view:nth-child(2) {
+  animation-delay: 0.15s;
 }
-.dots view:nth-child(3) {
-  animation-delay: 0.4s;
-}
-@keyframes blink {
-  0%, 80%, 100% { opacity: 0.25; }
-  40% { opacity: 1; }
+.typing view:nth-child(3) {
+  animation-delay: 0.3s;
 }
 .end {
   height: 8rpx;
+}
+
+/* Composer */
+.composer-wrap {
+  padding: 16rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));
 }
 .composer {
   display: flex;
   align-items: flex-end;
   gap: 16rpx;
-  padding: 16rpx 20rpx;
-  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  background: #f7f7f7;
-  border-top: 1rpx solid var(--line);
+  background: var(--surface);
+  border: 1rpx solid var(--line-strong);
+  border-radius: 44rpx;
+  padding: 14rpx 14rpx 14rpx 30rpx;
+  box-shadow: var(--shadow-md);
 }
-.input {
+.box {
   flex: 1;
-  min-height: 40rpx;
-  max-height: 240rpx;
-  background: #fff;
-  border-radius: 8rpx;
-  padding: 16rpx 20rpx;
-  font-size: 31rpx;
+  min-height: 44rpx;
+  max-height: 300rpx;
+  padding: 16rpx 0;
+  font-size: calc(var(--fs) + 1rpx);
+  line-height: 1.5;
+  color: var(--text);
+}
+.ph {
+  color: var(--text-3);
 }
 .send {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 28rpx;
+  background: var(--ember-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
-  margin: 0 !important;
-  height: 72rpx;
-  line-height: 72rpx;
-  padding: 0 28rpx !important;
+  transition: opacity 0.2s;
 }
-.send[disabled] {
-  background: #c6e8d4 !important;
-  color: #fff !important;
+.send.off {
+  opacity: 0.35;
+}
+.send image {
+  width: 36rpx;
+  height: 36rpx;
+}
+.note {
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Attach, upload note, inline approvals (web .attach, .upload-note, .approval) */
+.attach {
+  width: 72rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.attach image {
+  width: 40rpx;
+  height: 40rpx;
+}
+.composer {
+  padding-left: 10rpx !important;
+}
+.upload-note {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-2);
+  margin-bottom: 12rpx;
+}
+.ap-wrap {
+  margin-left: 88rpx;
 }

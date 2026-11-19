@@ -1,0 +1,26 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view wx:if="{{!signedIn}}" class="empty-card" bindtap="signIn">
+      <image src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+      <text>{{s.loginTitle}}</text>
+    </view>
+    <block wx:else>
+      <view wx:if="{{!loaded}}" class="muted">{{s.loading}}</view>
+      <view wx:elif="{{!own.length && !queue.length}}" class="empty-card">
+        <image src="/images/vera-face-laugh.webp" webp mode="aspectFill" />
+        <text>{{s.approval.none}}</text>
+      </view>
+      <view class="list">
+        <approval-card wx:for="{{own}}" wx:key="id" a="{{item}}" bind:done="onDone" />
+      </view>
+      <block wx:if="{{licensed}}">
+        <view class="section">{{s.approval.queue}}</view>
+        <view class="list">
+          <approval-card wx:for="{{queue}}" wx:key="id" a="{{item}}" bind:done="onDone" />
+        </view>
+        <view wx:if="{{!queue.length}}" class="muted">{{s.approval.none}}</view>
+      </block>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

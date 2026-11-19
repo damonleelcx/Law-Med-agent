@@ -1,0 +1,26 @@
+<view wx:if="{{v}}" class="gc domain-{{v.domain}}" bindtap="open">
+  <view class="gc-head">
+    <view class="gc-title">
+      <text class="gc-kicker">{{s.caseOpened}} · {{v.domainLabel}}</text>
+      <text class="gc-name">{{v.title}}</text>
+    </view>
+    <text class="pill pill-{{v.status}}">{{v.statusLabel}}</text>
+  </view>
+  <view wx:if="{{v.attention}}" class="gc-attn">! {{v.attention}}</view>
+  <view class="gc-bar"><view style="width: {{v.pct}}%" /></view>
+  <view wx:if="{{v.steps.length}}" class="gc-steps">
+    <view wx:for="{{v.steps}}" wx:key="id" class="gc-step st-{{item.status}}">
+      <view class="ti ti-{{item.icon}}">{{item.glyph}}</view>
+      <view class="gc-step-text">
+        <text class="gc-step-title">{{item.title}}</text>
+        <text wx:if="{{item.activity}}" class="activity {{item.activity.recovering ? 'recovering' : ''}}">{{item.activity.text}}</text>
+      </view>
+      <text wx:if="{{item.label}}" class="gc-step-label">{{item.label}}</text>
+    </view>
+  </view>
+  <view wx:else class="gc-planning">{{s.goal.status.planning}}…</view>
+  <view class="gc-foot">
+    <text>{{v.progress}}</text>
+    <text class="gc-link">{{s.viewCase}} →</text>
+  </view>
+</view>

@@ -51,6 +51,9 @@ type Config struct {
 	WXOfferID   string
 	WXPayAppKey string
 	WXPayEnv    int
+	// WXAPIBase is api.weixin.qq.com unless pointed at a stand-in for local
+	// testing (cmd/devmock).
+	WXAPIBase string
 }
 
 func Load() (Config, error) {
@@ -80,6 +83,7 @@ func Load() (Config, error) {
 		WXOfferID:             os.Getenv("ACT_WX_OFFER_ID"),
 		WXPayAppKey:           os.Getenv("ACT_WX_PAY_APPKEY"),
 		WXPayEnv:              envInt("ACT_WX_PAY_ENV", 0),
+		WXAPIBase:             strings.TrimRight(env("ACT_WX_API_BASE", "https://api.weixin.qq.com"), "/"),
 	}
 	for _, e := range strings.Split(os.Getenv("ACT_ADMIN_EMAILS"), ",") {
 		if e = strings.ToLower(strings.TrimSpace(e)); e != "" {

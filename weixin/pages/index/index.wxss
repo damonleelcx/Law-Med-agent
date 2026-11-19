@@ -1,78 +1,118 @@
-.top {
+/* After the web app's sidebar (web/src/styles/app.css: .side, .side-new, .side-list). */
+.hero {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 32rpx;
+  gap: 28rpx;
+  background: var(--surface);
+  border-radius: 40rpx;
+  padding: 28rpx;
+  box-shadow: var(--shadow-md);
 }
-.new {
-  margin-left: auto;
-  color: var(--green);
-  font-size: 30rpx;
+.portrait {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 44rpx;
+  overflow: hidden;
+  flex: none;
+  background: var(--face-bg);
+  box-shadow: var(--shadow-sm);
+}
+.portrait image {
+  width: 100%;
+  height: 100%;
+}
+.hero-text {
+  min-width: 0;
+}
+.name {
+  font-size: 40rpx;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.tag {
+  font-size: 24rpx;
   font-weight: 500;
 }
+.sub {
+  margin-top: 10rpx;
+  color: var(--text-2);
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+.new {
+  margin-top: 32rpx;
+  width: 100%;
+}
+.chips {
+  margin-top: 24rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  justify-content: center;
+}
+.section-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.link {
+  color: var(--ember-600);
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 0 8rpx;
+}
+.search {
+  width: 100%;
+  margin-bottom: 12rpx;
+}
 .list {
-  background: var(--cell);
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
 }
 .row {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 32rpx;
-  position: relative;
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
 }
-.row::after {
-  content: '';
-  position: absolute;
-  left: 144rpx;
-  right: 0;
-  bottom: 0;
-  border-bottom: 1rpx solid var(--line);
+.row-hover-bg {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
-.row-hover {
-  background: #ececec;
-}
-.avatar {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 12rpx;
-  flex: none;
-  background: #dfe8e6;
-}
-.body {
-  flex: 1;
-  min-width: 0;
-  margin-left: 24rpx;
-}
-.line1 {
+.row-top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 16rpx;
 }
 .title {
-  font-size: 32rpx;
+  font-size: 30rpx;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .when {
-  font-size: 22rpx;
   flex: none;
-  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
 }
 .last {
   display: block;
-  margin-top: 8rpx;
+  margin-top: 6rpx;
   font-size: 26rpx;
+  color: var(--text-3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .empty {
-  text-align: center;
-  padding: 120rpx 48rpx;
+  padding: 24rpx 8rpx;
+  font-size: 27rpx;
 }
 .foot {
+  margin-top: 48rpx;
   font-size: 22rpx;
-  padding: 32rpx 48rpx 64rpx;
+  color: var(--text-3);
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
 }

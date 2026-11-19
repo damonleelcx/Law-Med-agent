@@ -1,0 +1,31 @@
+.meta {
+  display: block;
+  color: var(--text-3);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.title {
+  margin: 8rpx 0 20rpx;
+}
+.actions {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
+/* The web app's .paper: the document on a sheet. */
+.paper {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 32rpx;
+  padding: 40rpx 36rpx;
+  box-shadow: var(--shadow-md);
+  line-height: 1.7;
+  font-size: var(--fs);
+  word-break: break-word;
+}
+.sha {
+  display: block;
+  margin-top: 20rpx;
+  font-size: 22rpx;
+  font-family: Menlo, Consolas, monospace;
+}

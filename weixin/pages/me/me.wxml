@@ -1,0 +1,45 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <!-- Signed out: who Vera is, and a way in. -->
+    <view wx:if="{{!signedIn}}" class="card hello">
+      <image class="vface face" src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+      <view class="hello-text">{{s.me.signInHint}}</view>
+      <button class="btn btn-ember" hover-class="btn-hover" bindtap="signIn">{{s.loginBtn}}</button>
+    </view>
+
+    <view wx:else class="card profile">
+      <view class="avatar">{{me ? me.initial : ''}}</view>
+      <view class="who">
+        <text class="nm">{{me ? me.name : s.loading}}</text>
+        <text wx:if="{{me}}" class="muted role">{{s.settings.wechatAccount}} · {{me.role}}<text wx:if="{{me.licensed}}" class="ok-tag"> ✓ {{s.settings.lic.verified}}</text></text>
+      </view>
+    </view>
+
+    <view class="card list">
+      <view class="item" hover-class="item-hover" bindtap="stamps">
+        <text class="ic">✉</text>
+        <text class="lbl">{{s.me.stamps}}</text>
+        <text wx:if="{{signedIn && stampsEnabled && balance !== null}}" class="val">{{balance}}</text>
+        <text class="chev">›</text>
+      </view>
+      <view class="item" hover-class="item-hover" bindtap="approvals">
+        <text class="ic">✓</text>
+        <text class="lbl">{{s.me.approvals}}</text>
+        <text wx:if="{{pending}}" class="badge">{{pending}}</text>
+        <text class="chev">›</text>
+      </view>
+    </view>
+
+    <view class="section">{{s.settings.title}}</view>
+    <view class="card list">
+      <view wx:for="{{tabs}}" wx:key="key" class="item" hover-class="item-hover" data-tab="{{item.key}}" bindtap="settings">
+        <text class="lbl">{{item.label}}</text>
+        <text class="chev">›</text>
+      </view>
+    </view>
+
+    <button wx:if="{{signedIn}}" class="btn btn-ghost out" hover-class="btn-hover" bindtap="signOut">{{s.me.signOut}}</button>
+    <view class="foot">{{s.disclaimer}}</view>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

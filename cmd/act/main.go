@@ -120,6 +120,7 @@ func run(mode string) error {
 		wxc := wechat.Config{AppID: cfg.WXAppID, AppSecret: cfg.WXAppSecret, OfferID: cfg.WXOfferID, AppKey: cfg.WXPayAppKey, Env: cfg.WXPayEnv}
 		if wxc.Enabled() {
 			api.WX = wechat.New(wxc)
+			api.WX.BaseURL = cfg.WXAPIBase
 			if wxc.PayEnabled() {
 				api.Stamps = &wechat.Stamps{Pool: pool, WX: api.WX}
 				slog.Info("wechat: sign-in and stamps on", "env", wxc.Env)

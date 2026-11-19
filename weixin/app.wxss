@@ -1,39 +1,515 @@
-/* WeChat's own palette: grey page, white cells, green for the user's bubble
-   and primary actions. */
+/* The web app's design tokens and shared components (web/src/styles/tokens.css,
+   app.css): warm cream + ink with an ember accent; Vera's navy and teal are
+   the second voice. */
 page {
-  --bg: #ededed;
-  --cell: #ffffff;
-  --line: #e5e5e5;
-  --text: #111111;
-  --muted: #7f7f7f;
-  --green: #07c160;
-  --bubble-me: #95ec69;
-  --bubble-vera: #ffffff;
-  --danger: #fa5151;
+  --cream-50: #fbf6ee;
+  --cream-100: #f6eee2;
+  --cream-200: #efe4d2;
+  --ink-900: #1c1a17;
+  --ink-700: #3d3934;
+  --ink-500: #6f675d;
+  --ember-500: #e8662a;
+  --ember-600: #d4541a;
+  --ember-400: #f08a4f;
+  --amber-400: #f4b13e;
+  --teal-500: #1d9e9a;
+  --navy-800: #232846;
+  --rose-500: #d8483b;
+
+  --bg: var(--cream-200);
+  --bg-soft: var(--cream-100);
+  --surface: #fffaf3;
+  --surface-2: #fbf4e8;
+  --line: rgba(28, 26, 23, 0.09);
+  --line-strong: rgba(28, 26, 23, 0.16);
+  --text: var(--ink-900);
+  --text-2: var(--ink-700);
+  --text-3: var(--ink-500);
+  --accent: var(--ember-500);
+  --user-bubble: var(--ink-900);
+  --user-ink: var(--cream-50);
+  --face-bg: #f4dfc4;
+  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.06), 0 2px 8px rgba(60, 40, 20, 0.05);
+  --shadow-md: 0 8px 24px rgba(60, 40, 20, 0.09), 0 2px 6px rgba(60, 40, 20, 0.05);
+  --shadow-lg: 0 24px 60px rgba(60, 40, 20, 0.14), 0 6px 16px rgba(60, 40, 20, 0.06);
+  --fs: 30rpx;
+
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
-  font-size: 32rpx;
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+  font-size: 30rpx;
+  line-height: 1.5;
 }
 
+@media (prefers-color-scheme: dark) {
+  page {
+    --bg: #15130f;
+    --bg-soft: #1b1814;
+    --surface: #211e19;
+    --surface-2: #28241e;
+    --line: rgba(255, 244, 228, 0.08);
+    --line-strong: rgba(255, 244, 228, 0.16);
+    --text: #f3ebdf;
+    --text-2: #cfc4b4;
+    --text-3: #9a8f80;
+    --user-bubble: #3a342c;
+    --user-ink: #f3ebdf;
+    --face-bg: #3a342c;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* Every page's outermost view. An explicit theme from Settings → 外观
+   overrides the system one. */
+.root {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--fs);
+  box-sizing: border-box;
+}
+.root.theme-light {
+  --bg: var(--cream-200);
+  --bg-soft: var(--cream-100);
+  --surface: #fffaf3;
+  --surface-2: #fbf4e8;
+  --line: rgba(28, 26, 23, 0.09);
+  --line-strong: rgba(28, 26, 23, 0.16);
+  --text: var(--ink-900);
+  --text-2: var(--ink-700);
+  --text-3: var(--ink-500);
+  --user-bubble: var(--ink-900);
+  --user-ink: var(--cream-50);
+  --face-bg: #f4dfc4;
+  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.06), 0 2px 8px rgba(60, 40, 20, 0.05);
+  --shadow-md: 0 8px 24px rgba(60, 40, 20, 0.09), 0 2px 6px rgba(60, 40, 20, 0.05);
+  --shadow-lg: 0 24px 60px rgba(60, 40, 20, 0.14), 0 6px 16px rgba(60, 40, 20, 0.06);
+}
+.root.theme-dark {
+  --bg: #15130f;
+  --bg-soft: #1b1814;
+  --surface: #211e19;
+  --surface-2: #28241e;
+  --line: rgba(255, 244, 228, 0.08);
+  --line-strong: rgba(255, 244, 228, 0.16);
+  --text: #f3ebdf;
+  --text-2: #cfc4b4;
+  --text-3: #9a8f80;
+  --user-bubble: #3a342c;
+  --user-ink: #f3ebdf;
+  --face-bg: #3a342c;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.root.fs-small {
+  --fs: 28rpx;
+}
+.root.fs-medium {
+  --fs: 30rpx;
+}
+.root.fs-large {
+  --fs: 34rpx;
+}
+.motion-reduce .vface.pulse,
+.motion-reduce .portrait,
+.motion-reduce .typing view,
+.motion-reduce .ti-run {
+  animation: none !important;
+}
+
+.pad {
+  padding: 32rpx 32rpx 48rpx;
+}
 .muted {
-  color: var(--muted);
+  color: var(--text-3);
+}
+.h1 {
+  font-size: 48rpx;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+.section {
+  margin: 40rpx 8rpx 16rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
 }
 
-.btn-primary {
-  background: var(--green) !important;
-  color: #fff !important;
-  border-radius: 8rpx;
-  font-weight: 500;
+/* Buttons, as on the web: ember for the one main action, ink for secondary. */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 40rpx;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: 0;
+  line-height: 88rpx;
+  margin: 0;
+}
+.btn::after {
+  border: 0;
+}
+.btn-sm {
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 28rpx;
+  font-size: 26rpx;
+  display: inline-flex;
+  width: auto !important;
+}
+.btn-ember {
+  background: var(--ember-500);
+  color: #fff;
+}
+.btn-ink {
+  background: var(--text);
+  color: var(--bg);
+}
+.btn-soft {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1rpx solid var(--line-strong);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border: 1rpx solid var(--line-strong);
+}
+.btn-danger {
+  background: rgba(216, 72, 59, 0.1);
+  color: #b3261e;
+}
+.btn[disabled] {
+  opacity: 0.45;
+}
+.btn-hover {
+  opacity: 0.85;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  padding: 6rpx 18rpx;
+  padding: 8rpx 20rpx;
   border-radius: 999rpx;
-  background: rgba(7, 193, 96, 0.12);
-  color: var(--green);
+  background: rgba(232, 102, 42, 0.12);
+  color: var(--ember-600);
   font-size: 24rpx;
+  font-weight: 600;
+}
+.badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  border-radius: 99rpx;
+  background: var(--ember-500);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+  text-align: center;
+  padding: 0 10rpx;
+  box-sizing: border-box;
+}
+.ok-tag {
+  color: #0f6a67;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+/* Cards and rows */
+.card {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 36rpx;
+  box-shadow: var(--shadow-sm);
+}
+.card-pad {
+  padding: 28rpx 32rpx;
+}
+.empty-card {
+  display: flex;
+  gap: 28rpx;
+  align-items: center;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 40rpx;
+  padding: 32rpx;
+  color: var(--text-2);
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+.empty-card image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 32rpx;
+  flex: none;
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 26rpx 28rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 28rpx;
+  margin-bottom: 12rpx;
+}
+.file-row .fr-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  background: rgba(232, 102, 42, 0.12);
+  color: var(--ember-600);
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.file-row .fr-text {
+  flex: 1;
+  min-width: 0;
+}
+.file-row .fr-title {
+  display: block;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-row .fr-sub {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+.row-hover {
+  opacity: 0.8;
+}
+
+/* Status pill (web .pill) */
+.pill {
+  display: inline-block;
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 18rpx;
+  border-radius: 99rpx;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1rpx solid var(--line);
+}
+.pill-active,
+.pill-planning {
+  background: rgba(232, 102, 42, 0.12);
+  color: var(--ember-600);
+  border-color: transparent;
+}
+.pill-completed {
+  background: rgba(29, 158, 154, 0.14);
+  color: #0f6a67;
+  border-color: transparent;
+}
+.pill-needs_attention {
+  background: rgba(244, 177, 62, 0.2);
+  color: #7a5410;
+  border-color: transparent;
+}
+.pill-cancelled,
+.pill-failed {
+  background: rgba(216, 72, 59, 0.1);
+  color: #9d2c22;
+  border-color: transparent;
+}
+
+/* Task icons (web .ti) */
+.ti {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 22rpx;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.ti-done {
+  background: var(--teal-500);
+  color: #fff;
+}
+.ti-fail {
+  background: var(--rose-500);
+  color: #fff;
+}
+.ti-wait {
+  background: var(--amber-400);
+  color: #3b2604;
+}
+.ti-next {
+  border: 3rpx solid var(--ember-400);
+  color: var(--ember-500);
+}
+.ti-run {
+  border: 4rpx solid rgba(232, 102, 42, 0.25);
+  border-top-color: var(--ember-500);
+  animation: spin 0.8s linear infinite;
+}
+.ti-idle {
+  border: 3rpx dashed var(--line-strong);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Progress bar (web .gc-bar) */
+.gc-bar {
+  height: 10rpx;
+  background: var(--surface-2);
+  border-radius: 99rpx;
+  overflow: hidden;
+  margin: 24rpx 0 20rpx;
+}
+.gc-bar view {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber-400), var(--ember-500));
+  border-radius: 99rpx;
+  transition: width 0.6s;
+}
+
+/* Attention banner */
+.attn {
+  display: flex;
+  gap: 20rpx;
+  background: rgba(244, 177, 62, 0.16);
+  color: #6b4a0c;
+  border: 1rpx solid rgba(244, 177, 62, 0.4);
+  border-radius: 28rpx;
+  padding: 24rpx 28rpx;
+  font-size: 27rpx;
+  line-height: 1.55;
+}
+.attn-title {
+  font-weight: 700;
+}
+
+/* Segmented control (web .seg) */
+.seg {
+  display: inline-flex;
+  padding: 6rpx;
+  background: var(--surface-2);
+  border: 1rpx solid var(--line);
+  border-radius: 999rpx;
+}
+.seg-item {
+  padding: 14rpx 28rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+  font-size: 26rpx;
+  color: var(--text-2);
+}
+.seg-item.on {
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Settings rows */
+.s-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 28rpx 32rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.s-row:last-child {
+  border-bottom: 0;
+}
+.s-label {
+  flex: 1;
+  min-width: 0;
+}
+.s-label .t {
+  display: block;
+  font-weight: 600;
+}
+.s-label .h {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+  line-height: 1.5;
+}
+.input {
+  background: var(--surface-2);
+  border: 1rpx solid var(--line-strong);
+  border-radius: 20rpx;
+  height: 76rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+.lic {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 4rpx 16rpx;
+  border-radius: 99rpx;
+}
+.lic-pending {
+  background: rgba(244, 177, 62, 0.2);
+  color: #7a5410;
+}
+.lic-verified {
+  background: rgba(29, 158, 154, 0.14);
+  color: #0f6a67;
+}
+.lic-rejected {
+  background: rgba(216, 72, 59, 0.1);
+  color: #9d2c22;
+}
+
+/* Vera's face, as in the web app's .vface: a soft square, breathing while she works. */
+.vface {
+  display: block;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: var(--face-bg);
+  box-shadow: 0 4rpx 16rpx rgba(80, 50, 20, 0.15);
+  flex: none;
+}
+.vface.pulse {
+  animation: breathe 1.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    box-shadow: 0 0 0 10rpx rgba(232, 102, 42, 0.18);
+  }
+}
+@keyframes float {
+  50% {
+    transform: translateY(-12rpx);
+  }
+}
+@keyframes blink {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-6rpx);
+  }
 }

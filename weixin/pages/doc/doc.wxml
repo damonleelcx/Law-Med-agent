@@ -1,0 +1,21 @@
+<view class="root {{ui}}">
+  <view class="pad">
+    <view wx:if="{{!signedIn}}" class="empty-card" bindtap="signIn">
+      <image src="/images/vera-face-smile.webp" webp mode="aspectFill" />
+      <text>{{s.loginToSeeDocs}}</text>
+    </view>
+    <view wx:elif="{{err}}" class="attn">{{err}}</view>
+    <view wx:elif="{{!d}}" class="muted">{{s.loading}}</view>
+    <block wx:else>
+      <text class="meta">{{d.meta}}</text>
+      <view class="h1 title">{{d.title}}</view>
+      <view class="actions">
+        <button class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="copyAll">{{s.docs.copyAll}}</button>
+        <button class="btn btn-soft btn-sm" hover-class="btn-hover" bindtap="share">{{s.docs.share}}</button>
+      </view>
+      <view class="paper prose"><rich-text nodes="{{d.html}}" user-select /></view>
+      <text class="muted sha">sha256 {{d.sha}}…</text>
+    </block>
+  </view>
+  <login-sheet id="login" bind:login="onLogin" />
+</view>

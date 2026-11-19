@@ -1,0 +1,68 @@
+.mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(28, 26, 23, 0.42);
+  display: flex;
+  align-items: flex-end;
+  animation: fade 0.2s ease-out;
+}
+.sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 48rpx 48rpx 0 0;
+  padding: 20rpx 48rpx calc(40rpx + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: rise 0.28s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.grab {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 8rpx;
+  background: var(--line-strong);
+  margin-bottom: 36rpx;
+}
+.face {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 36rpx;
+  margin-bottom: 28rpx;
+}
+.title {
+  font-size: 40rpx;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 14rpx;
+}
+.sub {
+  color: var(--text-2);
+  font-size: 28rpx;
+  line-height: 1.6;
+  margin-bottom: 44rpx;
+}
+.go {
+  width: 100%;
+}
+.later {
+  color: var(--text-3);
+  font-size: 28rpx;
+  padding: 28rpx;
+}
+.terms {
+  color: var(--text-3);
+  font-size: 22rpx;
+}
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

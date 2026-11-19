@@ -1,6 +1,6 @@
 {
   "description": "ACT · Vera — WeChat mini program",
-  "appid": "wx0000000000000000",
+  "appid": "touristappid",
   "projectname": "act-vera",
   "compileType": "miniprogram",
   "libVersion": "3.6.0",

@@ -1,0 +1,202 @@
+/* After the web app's CaseView (.case-head, .plan, .timeline, .case-side). */
+.meta {
+  display: block;
+  color: var(--text-3);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.title {
+  margin: 8rpx 0 16rpx;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.block {
+  margin-top: 28rpx;
+}
+.attn text:first-child {
+  font-weight: 800;
+}
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  margin-top: 24rpx;
+}
+.plan-item {
+  display: flex;
+  gap: 22rpx;
+  padding: 26rpx 28rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  border-radius: 28rpx;
+}
+.plan-item.st-leased {
+  border-color: rgba(232, 102, 42, 0.45);
+}
+.plan-item .ti {
+  margin-top: 4rpx;
+}
+.plan-body {
+  flex: 1;
+  min-width: 0;
+}
+.plan-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.plan-title {
+  font-weight: 600;
+}
+.plan-label {
+  flex: none;
+  font-size: 23rpx;
+  color: var(--text-3);
+}
+.activity {
+  display: block;
+  font-size: 23rpx;
+  color: var(--ember-600);
+  margin-top: 4rpx;
+}
+.activity.recovering {
+  color: #7a5410;
+}
+.plan-sum {
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+.plan-short::after {
+  content: ' ▾';
+  color: var(--text-3);
+}
+.plan-err {
+  display: block;
+  color: #9d2c22;
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+.plan-wait {
+  display: block;
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}
+.prose {
+  line-height: 1.68;
+  font-size: var(--fs);
+  word-break: break-word;
+}
+.timeline {
+  margin-top: 24rpx;
+}
+.tl-summary {
+  background: var(--surface-2);
+  border-radius: 24rpx;
+  padding: 22rpx 26rpx;
+  margin-bottom: 20rpx;
+  font-size: 26rpx;
+}
+.ev {
+  display: flex;
+  gap: 22rpx;
+  padding-bottom: 28rpx;
+  position: relative;
+}
+.ev::before {
+  content: '';
+  position: absolute;
+  left: 11rpx;
+  top: 30rpx;
+  bottom: 0;
+  width: 2rpx;
+  background: var(--line-strong);
+}
+.ev-dot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 4rpx solid var(--ember-400);
+  box-sizing: border-box;
+  margin-top: 8rpx;
+  flex: none;
+}
+.ev-goal .ev-dot,
+.ev-approval .ev-dot {
+  border-color: var(--navy-800);
+}
+.ev-task .ev-dot {
+  border-color: var(--teal-500);
+}
+.ev.bad .ev-dot {
+  border-color: var(--rose-500);
+}
+.ev-body {
+  flex: 1;
+  min-width: 0;
+}
+.ev-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.ev-label {
+  font-weight: 600;
+  font-size: 27rpx;
+}
+.ev-at {
+  flex: none;
+  font-size: 22rpx;
+}
+.ev-detail,
+.ev-why {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-2);
+  margin-top: 4rpx;
+  line-height: 1.5;
+}
+.ev-why {
+  color: var(--text-3);
+}
+.next-row,
+.rem-row {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 8rpx 0;
+  font-size: 27rpx;
+}
+.rem-row {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2rpx;
+}
+.rem-at {
+  font-size: 22rpx;
+}
+.crit {
+  font-size: 27rpx;
+  padding: 6rpx 0;
+  color: var(--text-2);
+}
+.usage {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+.u-n {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--text);
+}
