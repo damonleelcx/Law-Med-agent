@@ -1,7 +1,8 @@
 # Nightly dump of the China database to the node's disk (/var/backups/act),
 # 14 days kept. The database volume is local to one node, so this protects
 # against a broken database, not a lost disk: copying the dumps off the node
-# (OSS) is the next step, once a bucket is chosen. It only uses postgres:17.6,
+# (OSS) is the next step, once a bucket is chosen; when it is, add OSS back to
+# the providers in web/src/pages/legal/content.cn.ts (section 四). It only uses postgres:17.6,
 # which is already on the node (Docker Hub is not reachable from it).
 apiVersion: batch/v1
 kind: CronJob

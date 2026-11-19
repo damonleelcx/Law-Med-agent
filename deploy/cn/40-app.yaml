@@ -1,5 +1,5 @@
 # China copy of deploy/k8s/30-deploy.yaml and 40-service.yaml: no mail-relay
-# host alias (mail goes to DirectMail). Two deployments from one image: the
+# host alias (the China copy sends no mail). Two deployments from one image: the
 # web tier holds no work, the workers hold no HTTP.
 apiVersion: apps/v1
 kind: Deployment
