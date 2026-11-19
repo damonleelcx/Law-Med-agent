@@ -7,11 +7,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"io/fs"
 	"log/slog"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -41,6 +43,12 @@ type Server struct {
 	// are free (virtual payment is not configured).
 	WX     *wechat.Client
 	Stamps *wechat.Stamps
+
+	// Region "cn" serves the mainland copy (see shell); ICPBeian is its
+	// filing number, shown in the footer.
+	Region     string
+	ICPBeian   string
+	ICPLicence string
 
 	limiter *limiter
 }
@@ -517,8 +525,34 @@ func (s *Server) spa() http.Handler {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("Cache-Control", "no-cache")
-		w.Write(b)
+		w.Write(s.shell(b))
 	})
+}
+
+// One whole <link> line to Google Fonts. Only spaces/tabs around it, so a
+// match never eats the next line's indentation (and with it the next match).
+var googleFonts = regexp.MustCompile(`(?m)^[ \t]*<link[^>]*fonts\.(googleapis|gstatic)\.com[^>]*>[ \t]*\r?\n?`)
+
+// shell adapts the page shell to the copy it is served from. The mainland
+// copy opens in Chinese, loads nothing from Google (blocked there; the font
+// stacks fall back to PingFang / Microsoft YaHei), and carries its ICP filing
+// number for the footer. The web app reads both from <meta> tags.
+func (s *Server) shell(b []byte) []byte {
+	if s.Region != "cn" {
+		return b
+	}
+	h := string(b)
+	h = strings.Replace(h, `<html lang="en">`, `<html lang="zh-CN">`, 1)
+	h = googleFonts.ReplaceAllString(h, "")
+	h = regexp.MustCompile(`<title>[^<]*</title>`).ReplaceAllString(h, "<title>ACT · 维拉——法律与健康，一起照看</title>")
+	meta := `<meta name="act-region" content="cn" />`
+	if s.ICPBeian != "" {
+		meta += `<meta name="act-icp" content="` + html.EscapeString(s.ICPBeian) + `" />`
+	}
+	if s.ICPLicence != "" {
+		meta += `<meta name="act-icp-licence" content="` + html.EscapeString(s.ICPLicence) + `" />`
+	}
+	return []byte(strings.Replace(h, "</head>", meta+"</head>", 1))
 }
 
 // ── live updates ───────────────────────────────────────────────────────────

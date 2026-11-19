@@ -2,14 +2,21 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { IconArrowL, LogoMark } from '../../components/Icons'
 import LangSwitch from '../../components/LangSwitch'
-import { useI18n } from '../../lib/i18n'
+import { icp, icpLicence, region, useI18n } from '../../lib/i18n'
 import { privacy, terms } from './content'
+import { cnPrivacy, cnTerms } from './content.cn'
 import '../../styles/legal.css'
 
+// The mainland China copy has its own documents, in Chinese only, naming only
+// the mainland providers it uses (content.cn.ts).
+const cn = region === 'cn'
+
 export default function Legal({ kind }: { kind: 'terms' | 'privacy' }) {
-  const { lang, t } = useI18n()
-  const doc = (kind === 'terms' ? terms : privacy)[lang]
-  const other = kind === 'terms' ? { to: '/privacy', label: privacy[lang].title } : { to: '/terms', label: terms[lang].title }
+  const { lang: uiLang, t } = useI18n()
+  const lang = cn ? 'zh' : uiLang
+  const pick = (k: 'terms' | 'privacy') => (cn ? (k === 'terms' ? cnTerms : cnPrivacy) : (k === 'terms' ? terms : privacy)[lang])
+  const doc = pick(kind)
+  const other = kind === 'terms' ? { to: '/privacy', label: pick('privacy').title } : { to: '/terms', label: pick('terms').title }
   useEffect(() => {
     document.title = `${doc.title} · ACT`
     window.scrollTo(0, 0)
@@ -18,7 +25,7 @@ export default function Legal({ kind }: { kind: 'terms' | 'privacy' }) {
     <div className="legal">
       <header className="legal-top">
         <Link to="/" className="legal-logo"><LogoMark /><span>ACT</span></Link>
-        <LangSwitch />
+        {!cn && <LangSwitch />}
       </header>
       <main className="legal-body">
         <Link to="/" className="legal-back"><IconArrowL size={16} /> {lang === 'zh' ? '返回首页' : 'Back to home'}</Link>
@@ -36,7 +43,9 @@ export default function Legal({ kind }: { kind: 'terms' | 'privacy' }) {
         ))}
         <footer className="legal-foot">
           <Link to={other.to}>{other.label} →</Link>
-          <p>{t.footer.disclaimer}</p>
+          <p>{cn ? "ACT 提供信息与协助。在持证专业人士审阅之前，本站内容均不构成法律或医疗意见。紧急情况请拨打 120。" : t.footer.disclaimer}</p>
+          {icp && <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{icp}</a></p>}
+          {icpLicence && <p>增值电信业务经营许可证：{icpLicence}</p>}
         </footer>
       </main>
     </div>

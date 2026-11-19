@@ -1,0 +1,52 @@
+# Nightly dump of the China database to the node's disk (/var/backups/act),
+# 14 days kept. The database volume is local to one node, so this protects
+# against a broken database, not a lost disk: copying the dumps off the node
+# (OSS) is the next step, once a bucket is chosen. It only uses postgres:17.6,
+# which is already on the node (Docker Hub is not reachable from it).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: act-backup
+  namespace: act
+spec:
+  schedule: "41 3 * * *"
+  timeZone: "Asia/Shanghai"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels: { app.kubernetes.io/name: act-backup }
+        spec:
+          restartPolicy: Never
+          volumes:
+            - name: backups
+              hostPath: { path: /var/backups/act, type: DirectoryOrCreate }
+          containers:
+            - name: pg-dump
+              image: postgres:17.6
+              imagePullPolicy: IfNotPresent
+              # A new pod can be refused until the network policy admits it: retry.
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  f=/backups/act-$(date -u +%Y-%m-%dT%H%M).dump
+                  for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+                    if pg_dump -h postgres -U act -d act -Fc -f "$f.part"; then mv "$f.part" "$f"; ln -sf "$(basename "$f")" /backups/latest.dump; break; fi
+                    sleep 5
+                  done
+                  [ -f "$f" ]
+                  find /backups -name 'act-*.dump' -mtime +14 -delete
+                  ls -l /backups | tail -5
+              env:
+                - name: PGPASSWORD
+                  valueFrom: { secretKeyRef: { name: act-db, key: POSTGRES_PASSWORD } }
+              volumeMounts: [{ name: backups, mountPath: /backups }]
+              resources:
+                limits: { memory: 256Mi }

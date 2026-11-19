@@ -1,0 +1,76 @@
+# Postgres for the China copy, as a container on this node with its own local
+# volume. Only ACT's pods and its backup job may connect (the policy below).
+# The volume dies with the node, so 70-backup.yaml dumps it nightly.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: act
+spec:
+  clusterIP: None
+  selector: { app.kubernetes.io/name: act-postgres }
+  ports: [{ name: postgres, port: 5432 }]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: act
+  labels: { app.kubernetes.io/name: act-postgres, app.kubernetes.io/component: database }
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector: { matchLabels: { app.kubernetes.io/name: act-postgres } }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: act-postgres, app.kubernetes.io/component: database }
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: postgres
+          image: postgres:17.6
+          imagePullPolicy: IfNotPresent
+          ports: [{ name: postgres, containerPort: 5432 }]
+          env:
+            - { name: POSTGRES_USER, value: act }
+            - { name: POSTGRES_DB, value: act }
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: act-db, key: POSTGRES_PASSWORD } }
+          args: ["-c", "shared_buffers=128MB", "-c", "max_connections=60"]
+          readinessProbe:
+            exec: { command: ["pg_isready", "-U", "act", "-d", "act"] }
+            periodSeconds: 10
+          livenessProbe:
+            exec: { command: ["pg_isready", "-U", "act", "-d", "act"] }
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 50m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources: { requests: { storage: 10Gi } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-ingress
+  namespace: act
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/component: database }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app.kubernetes.io/part-of: act }
+        - podSelector:
+            matchLabels: { app.kubernetes.io/name: act-backup }
+      ports:
+        - { protocol: TCP, port: 5432 }

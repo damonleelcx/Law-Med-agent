@@ -54,7 +54,17 @@ type Config struct {
 	// WXAPIBase is api.weixin.qq.com unless pointed at a stand-in for local
 	// testing (cmd/devmock).
 	WXAPIBase string
+
+	// Region "cn" is the mainland China copy (vera.zhiyuwujie.top): the site
+	// opens in Chinese, loads no Google Fonts (blocked there), and shows the
+	// ICP filing number in its footer, as mainland rules require.
+	Region     string
+	ICPBeian   string // the domain's filing number, e.g. 苏ICP备XXXXXXXX号-1
+	ICPLicence string // the telecom operating licence, e.g. 苏B2-20262623
 }
+
+// China reports whether this is the mainland copy.
+func (c Config) China() bool { return c.Region == "cn" }
 
 func Load() (Config, error) {
 	c := Config{
@@ -84,6 +94,9 @@ func Load() (Config, error) {
 		WXPayAppKey:           os.Getenv("ACT_WX_PAY_APPKEY"),
 		WXPayEnv:              envInt("ACT_WX_PAY_ENV", 0),
 		WXAPIBase:             strings.TrimRight(env("ACT_WX_API_BASE", "https://api.weixin.qq.com"), "/"),
+		Region:                strings.ToLower(strings.TrimSpace(os.Getenv("ACT_REGION"))),
+		ICPBeian:              strings.TrimSpace(os.Getenv("ACT_ICP_BEIAN")),
+		ICPLicence:            strings.TrimSpace(os.Getenv("ACT_ICP_LICENCE")),
 	}
 	for _, e := range strings.Split(os.Getenv("ACT_ADMIN_EMAILS"), ",") {
 		if e = strings.ToLower(strings.TrimSpace(e)); e != "" {

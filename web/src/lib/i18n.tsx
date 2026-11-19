@@ -399,11 +399,20 @@ const dicts: Record<Lang, Dict> = { en, zh }
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: Dict; f: (s: string, vars: Record<string, string | number>) => string }
 const I18n = createContext<Ctx>(null as unknown as Ctx)
 
+// The server marks the mainland China copy (vera.zhiyuwujie.top) with
+// <meta name="act-region" content="cn">; it opens in Chinese for everyone.
+export const region = document.querySelector('meta[name="act-region"]')?.getAttribute('content') || ''
+// Its ICP filing number, which mainland rules require in the footer.
+export const icp = document.querySelector('meta[name="act-icp"]')?.getAttribute('content') || ''
+// Its telecom operating licence (增值电信业务经营许可证), shown beside it.
+export const icpLicence = document.querySelector('meta[name="act-icp-licence"]')?.getAttribute('content') || ''
+
 function initialLang(): Lang {
   try {
     const s = localStorage.getItem('act.lang')
     if (s === 'en' || s === 'zh') return s
   } catch {}
+  if (region === 'cn') return 'zh'
   return navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en'
 }
 
