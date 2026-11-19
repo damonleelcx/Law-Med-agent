@@ -22,6 +22,12 @@ type Config struct {
 	LLMModel     string // reasoning, drafting, planning
 	LLMFastModel string // routing, judging, summarising
 
+	// Voice (TokenHub). An empty model turns that direction off.
+	SpeechBaseURL string
+	ASRModel      string
+	TTSModel      string
+	TTSVoice      int
+
 	SMTPHost    string
 	SMTPPort    int
 	SMTPUser    string
@@ -77,6 +83,9 @@ func Load() (Config, error) {
 		LLMAPIKey:             os.Getenv("ACT_LLM_API_KEY"),
 		LLMModel:              env("ACT_LLM_MODEL", "qwen3.8-max"),
 		LLMFastModel:          env("ACT_LLM_FAST_MODEL", "qwen3.8-flash"),
+		ASRModel:              strings.TrimSpace(os.Getenv("ACT_ASR_MODEL")),
+		TTSModel:              strings.TrimSpace(os.Getenv("ACT_TTS_MODEL")),
+		TTSVoice:              envInt("ACT_TTS_VOICE", 602003), // 爱小悠: expressive, female
 		SMTPHost:              os.Getenv("ACT_SMTP_HOST"),
 		SMTPPort:              envInt("ACT_SMTP_PORT", 587),
 		SMTPUser:              os.Getenv("ACT_SMTP_USERNAME"),
@@ -108,6 +117,9 @@ func Load() (Config, error) {
 	if c.SMTPFrom == "" {
 		c.SMTPFrom = c.SMTPUser
 	}
+	// Speech runs on the same TokenHub endpoint and key as the chat model
+	// unless told otherwise.
+	c.SpeechBaseURL = strings.TrimRight(env("ACT_SPEECH_BASE_URL", c.LLMBaseURL), "/")
 	if c.DatabaseURL == "" {
 		return c, fmt.Errorf("ACT_DATABASE_URL is required")
 	}

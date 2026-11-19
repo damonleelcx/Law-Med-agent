@@ -125,6 +125,9 @@ require('./lib')
     return 'tapped "' + t + '" → sent and answered'
   })
 
+  await mock.grant(20)
+  await require('./voice')() // hold-to-talk, cancel, spoken answers, 朗读
+
   let goalId = '', apId = ''
 
   await step('Setup: sign in from 对话, two chats via devmock, a seeded case with a pending 发送邮件 approval', async () => {
@@ -179,8 +182,10 @@ require('./lib')
     const title = (await text('.h1')).trim(); const body = JSON.stringify((await d.data('d')).html)
     assert(title.includes('租赁合同摘要'), 'title ' + title)
     assert(body.includes('5000'), 'body')
-    await mp.navigateBack(); await sleep(800)
-    const rows = (await els('.file-row')).length
+    // Wait for 文件 to be on top again: querying while DevTools is still
+    // switching pages hangs the automation call.
+    await mp.navigateBack(); await onPage('pages/docs/docs'); await sleep(800)
+    const rows = await until(async () => (await els('.file-row')).length, 10000, 'the 文件 list')
     return 'opened "' + title + '" with the 5000元 line; 文件 list now ' + rows + ' row(s)'
   })
 

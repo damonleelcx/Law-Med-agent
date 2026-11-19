@@ -2,11 +2,12 @@
 
 These tests drive the Vera mini program (`weixin/`) inside WeChat DevTools the way a person would: they tap, long-press and type into the rendered pages, then check what the pages show and what the local server stored.
 
-WeChat's own system UI can't be automated: the action sheet, confirm dialog, file and photo pickers, payment sheet, clipboard and share. Each of those calls is stubbed with `mockWxMethod`, and the step's name says when one is.
+WeChat's own system UI can't be automated: the action sheet, confirm dialog, file and photo pickers, payment sheet, clipboard and share, and the voice recorder, microphone permission and audio player. Each of those calls is stubbed with `mockWxMethod`, and the step's name says when one is.
 
 | Suite | Model | Covers |
 |---|---|---|
-| `devmock.js` (28 steps) | devmock: no tokens used | Every screen and button. The case and approval are created directly in the local database. |
+| `devmock.js` (34 steps) | devmock: no tokens used | Every screen and button, including voice. The case and approval are created directly in the local database. |
+| `voice.js` (5 steps) | devmock | Voice on its own: hold-to-talk, slide-up cancel, a spoken question answered aloud, 朗读 / 停止. |
 | `real-model.js` (31 steps) | Hunyuan | Also Vera's own work: she opens a real case, plans it and drafts documents. |
 
 `real-model.js` uses a lot of tokens: one run used about 880k, enough to run out a free quota on a key shared with production. Use `devmock.js` day to day and `real-model.js` before a release.

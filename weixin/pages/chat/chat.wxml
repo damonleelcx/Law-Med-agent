@@ -32,7 +32,10 @@
             </view>
             <view wx:if="{{item.pending && !item.content}}" class="typing"><view /><view /><view /></view>
             <view wx:else class="prose"><rich-text nodes="{{item.html}}" user-select /></view>
-            <view wx:if="{{!item.pending && item.content}}" class="copy" data-i="{{index}}" bindtap="copy">{{s.copy}}</view>
+            <view wx:if="{{!item.pending && item.content}}" class="acts">
+              <view class="copy" data-i="{{index}}" bindtap="copy">{{s.copy}}</view>
+              <view wx:if="{{voiceOut && item.id}}" class="speak {{playing === item.id ? 'on' : ''}}" data-i="{{index}}" bindtap="speak">{{playing === item.id ? s.speakStop : s.speak}}</view>
+            </view>
           </view>
         </view>
 
@@ -53,9 +56,19 @@
       <view class="attach" bindtap="attach"><image src="/images/clip.svg" /></view>
       <textarea class="box" value="{{input}}" bindinput="onInput" auto-height maxlength="12000" cursor-spacing="24"
         show-confirm-bar="{{false}}" placeholder="{{s.placeholder}}" placeholder-class="ph" confirm-type="send" bindconfirm="sendInput" />
-      <view class="send {{sending || !input ? 'off' : ''}}" bindtap="sendInput"><image src="/images/send.svg" /></view>
+      <!-- Empty box: hold to talk. Text in the box: send. -->
+      <view wx:if="{{voiceIn && !input && !sending}}" class="send mic {{recording ? 'rec' : ''}}" aria-label="{{s.voiceHold}}"
+        catchtouchstart="micStart" catchtouchmove="micMove" catchtouchend="micEnd" catchtouchcancel="micEnd"><image src="/images/mic.svg" /></view>
+      <view wx:else class="send {{sending || !input ? 'off' : ''}}" bindtap="sendInput"><image src="/images/send.svg" /></view>
     </view>
     <view class="note">{{s.disclaimer}}</view>
+  </view>
+  <view wx:if="{{recording}}" class="voice-overlay">
+    <view class="voice-card {{voiceCancel ? 'cancel' : ''}}">
+      <view class="voice-dot"><image src="/images/mic.svg" /></view>
+      <text class="voice-t">{{voiceCancel ? s.voiceRelease : s.voiceListening}}</text>
+      <text class="voice-sub">{{recSecs}}″ · {{s.voiceSlideCancel}}</text>
+    </view>
   </view>
   <login-sheet id="login" bind:login="onLogin" />
 </view>

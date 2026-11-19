@@ -20,6 +20,7 @@ package main
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	_ "embed"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -52,12 +53,19 @@ func main() {
 	})
 	m.HandleFunc("/xpay/", st.xpay)
 	m.HandleFunc("/mock/grant", st.grant)
+	m.HandleFunc("/mock/set", st.set)
 	m.HandleFunc("/mock/state", func(w http.ResponseWriter, r *http.Request) {
 		st.mu.Lock()
 		defer st.mu.Unlock()
 		writeJSON(w, map[string]any{"balance": st.balance, "orders": len(st.orders)})
 	})
 	m.HandleFunc("/v1/chat/completions", chat)
+	m.HandleFunc("/v1/wand/asrproxy/sync_transcribe", asr)
+	m.HandleFunc("/v1/tenlai/ttsproxy/text_to_voice", tts)
+	m.HandleFunc("/mock/tts.mp3", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "audio/mpeg")
+		w.Write(sampleMP3)
+	})
 	log.Printf("devmock on http://%s (stamps=%d)", addr, n)
 	log.Fatal(http.ListenAndServe(addr, logged(m)))
 }
@@ -237,4 +245,58 @@ func env(k, d string) string {
 		return v
 	}
 	return d
+}
+
+// sampleMP3 is Vera's voice (tenlai-tts-v1.0, voice 602003 爱小悠):
+// "你好，我是维拉。房东不退押金，先别急，我们一步一步来。"
+//
+//go:embed testdata/vera.mp3
+var sampleMP3 []byte
+
+// asr stands in for TokenHub speech recognition. Like the real one it fetches
+// the recording from input_url; the server advertises its public origin
+// (127.0.0.1:8080), which from this container is act-wx-server:8080.
+func asr(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		InputURL string `json:"input_url"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&in)
+	u := strings.Replace(in.InputURL, "127.0.0.1:8080", "act-wx-server:8080", 1)
+	res, err := http.Get(u)
+	if err != nil || res.StatusCode != 200 {
+		writeJSON(w, map[string]any{"error": map[string]string{"message": fmt.Sprintf("devmock: could not fetch %s", in.InputURL)}})
+		return
+	}
+	n, _ := io.Copy(io.Discard, res.Body)
+	res.Body.Close()
+	writeJSON(w, map[string]any{"status": "completed", "output": map[string]any{"text": "房东不退押金怎么办"},
+		"usage": map[string]int{"total_tokens": int(n/4000) + 22}})
+}
+
+// tts stands in for TokenHub speech synthesis, with its 300-byte limit.
+func tts(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Text string `json:"text"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&in)
+	if len(in.Text) > 300 {
+		writeJSON(w, map[string]any{"Response": map[string]any{"Error": map[string]string{"Code": "InvalidParameterValue",
+			"Message": fmt.Sprintf("field 'text' too long (bytes=%d, limit=300)", len(in.Text))}}})
+		return
+	}
+	writeJSON(w, map[string]any{"status": "completed", "data": map[string]string{"audio_url": "http://" + r.Host + "/mock/tts.mp3"}})
+}
+
+// set makes the balance exactly n (POST /mock/set?balance=3), so a test run
+// starts from a known count whatever earlier runs bought.
+func (s *state) set(w http.ResponseWriter, r *http.Request) {
+	n, err := strconv.Atoi(r.URL.Query().Get("balance"))
+	if err != nil || n < 0 {
+		http.Error(w, "balance=N", 400)
+		return
+	}
+	s.mu.Lock()
+	s.balance = n
+	s.mu.Unlock()
+	writeJSON(w, map[string]any{"balance": n})
 }

@@ -275,3 +275,80 @@
 .ap-wrap {
   margin-left: 88rpx;
 }
+
+/* Voice: hold-to-talk mic (in place of send while the box is empty), the
+   listening card, and 朗读 beside 复制. */
+.acts {
+  display: flex;
+  gap: 28rpx;
+}
+.speak {
+  display: inline-block;
+  color: var(--text-3);
+  font-size: 24rpx;
+  padding: 8rpx 0;
+}
+.speak.on {
+  color: var(--ember-500);
+  font-weight: 600;
+}
+.send.mic.rec {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 12rpx rgba(232, 102, 42, 0.18);
+}
+.voice-overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+}
+.voice-card {
+  background: rgba(28, 26, 23, 0.86);
+  color: #fff;
+  border-radius: 32rpx;
+  padding: 44rpx 56rpx 36rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14rpx;
+  min-width: 320rpx;
+}
+.voice-card.cancel {
+  background: rgba(216, 72, 59, 0.92);
+}
+.voice-dot {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 56rpx;
+  background: var(--ember-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: voice-pulse 1.2s ease-in-out infinite;
+}
+.voice-card.cancel .voice-dot {
+  background: rgba(255, 255, 255, 0.2);
+  animation: none;
+}
+.voice-dot image {
+  width: 52rpx;
+  height: 52rpx;
+}
+.voice-t {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.voice-sub {
+  font-size: 24rpx;
+  opacity: 0.75;
+}
+@keyframes voice-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 102, 42, 0.55); }
+  50% { box-shadow: 0 0 0 22rpx rgba(232, 102, 42, 0); }
+}
