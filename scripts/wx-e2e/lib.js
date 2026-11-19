@@ -12,6 +12,7 @@ const path = require('path')
 
 const SHOTS = process.env.SHOTS || ''
 const FROM = Number(process.env.FROM || 0)
+const UNTIL = Number(process.env.UNTIL || 0) // stop after step n
 const R = []
 const errors = []
 let mp
@@ -35,7 +36,7 @@ async function until(fn, ms, what) {
 let n = 0
 async function step(name, fn) {
   n++
-  if (n < FROM) return
+  if (n < FROM || (UNTIL && n > UNTIL)) return
   const e0 = errors.length, t0 = Date.now()
   let r
   try { const note = await fn(); r = { n, name, ok: true, note: note || '' } } catch (e) { r = { n, name, ok: false, note: e.message } }

@@ -53,6 +53,7 @@ func main() {
 	})
 	m.HandleFunc("/xpay/", st.xpay)
 	m.HandleFunc("/mock/grant", st.grant)
+	m.HandleFunc("/mock/set", st.set)
 	m.HandleFunc("/mock/state", func(w http.ResponseWriter, r *http.Request) {
 		st.mu.Lock()
 		defer st.mu.Unlock()
@@ -284,4 +285,18 @@ func tts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, map[string]any{"status": "completed", "data": map[string]string{"audio_url": "http://" + r.Host + "/mock/tts.mp3"}})
+}
+
+// set makes the balance exactly n (POST /mock/set?balance=3), so a test run
+// starts from a known count whatever earlier runs bought.
+func (s *state) set(w http.ResponseWriter, r *http.Request) {
+	n, err := strconv.Atoi(r.URL.Query().Get("balance"))
+	if err != nil || n < 0 {
+		http.Error(w, "balance=N", 400)
+		return
+	}
+	s.mu.Lock()
+	s.balance = n
+	s.mu.Unlock()
+	writeJSON(w, map[string]any{"balance": n})
 }

@@ -12,5 +12,7 @@ const http = require('http')
     console.log('delete account:', code)
   }
   await mp.evaluate(() => wx.clearStorageSync())
+  // devmock's balance is one number shared by every run; start from 3 again.
+  await new Promise((res) => { const q = http.request('http://127.0.0.1:8090/mock/set?balance=3', { method: 'POST' }, (r) => { r.resume(); r.on('end', res) }); q.on('error', res); q.end() })
   mp.disconnect()
 })().catch((e) => { console.error('ERR', e.message); process.exit(1) })
