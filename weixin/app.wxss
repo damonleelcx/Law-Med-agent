@@ -1,0 +1,39 @@
+/* WeChat's own palette: grey page, white cells, green for the user's bubble
+   and primary actions. */
+page {
+  --bg: #ededed;
+  --cell: #ffffff;
+  --line: #e5e5e5;
+  --text: #111111;
+  --muted: #7f7f7f;
+  --green: #07c160;
+  --bubble-me: #95ec69;
+  --bubble-vera: #ffffff;
+  --danger: #fa5151;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  font-size: 32rpx;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.btn-primary {
+  background: var(--green) !important;
+  color: #fff !important;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(7, 193, 96, 0.12);
+  color: var(--green);
+  font-size: 24rpx;
+}

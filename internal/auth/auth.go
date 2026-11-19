@@ -33,6 +33,7 @@ type User struct {
 	CreatedAt     time.Time  `json:"created_at"`
 	Licensed      bool       `json:"licensed"` // holds a VERIFIED licence matching the role
 	Admin         bool       `json:"admin"`
+	WeChat        bool       `json:"wechat"` // signed in through the WeChat mini program
 	VerifiedAt    *time.Time `json:"-"`
 }
 
@@ -167,7 +168,7 @@ func (s *Service) SignUp(ctx context.Context, email, password, name, lang string
 
 func (s *Service) SignIn(ctx context.Context, email, password string) (*User, error) {
 	var id, hash string
-	err := s.Pool.QueryRow(ctx, `SELECT id, password_hash FROM users WHERE lower(email)=lower($1) AND deleted_at IS NULL`,
+	err := s.Pool.QueryRow(ctx, `SELECT id, password_hash FROM users WHERE lower(email)=lower($1) AND email <> '' AND deleted_at IS NULL`,
 		strings.TrimSpace(email)).Scan(&id, &hash)
 	if errors.Is(err, pgx.ErrNoRows) {
 		CheckPassword(dummyHash, password)
@@ -186,15 +187,16 @@ func (s *Service) UserByID(ctx context.Context, id string) (*User, error) {
 	var u User
 	err := s.Pool.QueryRow(ctx, `SELECT u.id, u.email, u.name, u.role, u.email_verified_at, u.created_at,
 		EXISTS (SELECT 1 FROM professional_licenses l WHERE l.user_id=u.id AND l.status='verified'
-			AND ((u.role='attorney' AND l.kind='bar') OR (u.role='physician' AND l.kind='medical')))
+			AND ((u.role='attorney' AND l.kind='bar') OR (u.role='physician' AND l.kind='medical'))),
+		EXISTS (SELECT 1 FROM wechat_identities w WHERE w.user_id=u.id)
 		FROM users u WHERE u.id=$1 AND u.deleted_at IS NULL`, id).
-		Scan(&u.ID, &u.Email, &u.Name, &u.Role, &u.VerifiedAt, &u.CreatedAt, &u.Licensed)
+		Scan(&u.ID, &u.Email, &u.Name, &u.Role, &u.VerifiedAt, &u.CreatedAt, &u.Licensed, &u.WeChat)
 	if err != nil {
 		return nil, err
 	}
 	u.EmailVerified = u.VerifiedAt != nil
 	for _, a := range s.AdminEmails {
-		if strings.EqualFold(a, u.Email) && u.EmailVerified {
+		if u.Email != "" && strings.EqualFold(a, u.Email) && u.EmailVerified {
 			u.Admin = true
 		}
 	}
@@ -316,7 +318,7 @@ func (s *Service) VerifyEmail(ctx context.Context, raw string) (*User, error) {
 // exists is not disclosed.
 func (s *Service) ForgotPassword(ctx context.Context, email, lang string) error {
 	var id, name string
-	err := s.Pool.QueryRow(ctx, `SELECT id, name FROM users WHERE lower(email)=lower($1) AND deleted_at IS NULL`, strings.TrimSpace(email)).Scan(&id, &name)
+	err := s.Pool.QueryRow(ctx, `SELECT id, name FROM users WHERE lower(email)=lower($1) AND email <> '' AND deleted_at IS NULL`, strings.TrimSpace(email)).Scan(&id, &name)
 	if err != nil {
 		return nil
 	}
@@ -391,11 +393,56 @@ func (s *Service) DeleteAccount(ctx context.Context, userID, password string) er
 	if err := s.Pool.QueryRow(ctx, `SELECT password_hash FROM users WHERE id=$1`, userID).Scan(&hash); err != nil {
 		return err
 	}
-	if !CheckPassword(hash, password) {
+	// A WeChat account has no password; its live session is the proof.
+	if hash != "" && !CheckPassword(hash, password) {
 		return ErrInvalidCredentials
 	}
 	_, err := s.Pool.Exec(ctx, `DELETE FROM users WHERE id=$1`, userID)
 	return err
+}
+
+// ── WeChat ─────────────────────────────────────────────────────────────────
+
+// WeChatSignIn finds or creates the account for a mini program user and
+// stores the session key WeChat just issued. The account has no email and no
+// password: password_hash is empty, which CheckPassword never accepts.
+func (s *Service) WeChatSignIn(ctx context.Context, appid, openid, unionid, sessionKey, lang string) (*User, error) {
+	if appid == "" || openid == "" || sessionKey == "" {
+		return nil, errors.New("wechat identity is incomplete")
+	}
+	for attempt := 0; attempt < 2; attempt++ {
+		var userID string
+		err := s.Pool.QueryRow(ctx, `UPDATE wechat_identities SET session_key=$3,
+			unionid=CASE WHEN $4::text='' THEN unionid ELSE $4::text END, updated_at=now()
+			WHERE appid=$1 AND openid=$2 RETURNING user_id`, appid, openid, sessionKey, unionid).Scan(&userID)
+		if err == nil {
+			return s.UserByID(ctx, userID)
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return nil, err
+		}
+		err = pgx.BeginFunc(ctx, s.Pool, func(tx pgx.Tx) error {
+			if err := tx.QueryRow(ctx, `INSERT INTO users (email, password_hash, name) VALUES ('', '', '') RETURNING id`).Scan(&userID); err != nil {
+				return err
+			}
+			// No email to notify: email notifications start off.
+			if _, err := tx.Exec(ctx, `INSERT INTO user_preferences (user_id, data) VALUES ($1, jsonb_build_object('language', $2::text, 'notify_email', false, 'memory_enabled', true))`,
+				userID, lang); err != nil {
+				return err
+			}
+			_, err := tx.Exec(ctx, `INSERT INTO wechat_identities (user_id, appid, openid, unionid, session_key) VALUES ($1,$2,$3,$4,$5)`,
+				userID, appid, openid, unionid, sessionKey)
+			return err
+		})
+		if err == nil {
+			return s.UserByID(ctx, userID)
+		}
+		// A concurrent first sign-in created the identity: loop and take that one.
+		if !strings.Contains(err.Error(), "23505") {
+			return nil, err
+		}
+	}
+	return nil, errors.New("could not create the wechat account")
 }
 
 // ── Mail templates (English / 中文) ─────────────────────────────────────────

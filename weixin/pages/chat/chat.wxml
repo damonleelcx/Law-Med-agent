@@ -1,0 +1,31 @@
+<view class="page">
+  <view wx:if="{{stampsEnabled && balance !== null}}" class="bar" bindtap="stamps">
+    <view class="chip">✉ {{balance}} · {{s.perMessage}}</view>
+  </view>
+
+  <scroll-view class="log" scroll-y scroll-into-view="{{bottom}}" scroll-with-animation enhanced show-scrollbar="{{false}}">
+    <block wx:for="{{messages}}" wx:key="key">
+      <view wx:if="{{item.role === 'event'}}" class="sys"><text>{{item.content}}</text></view>
+
+      <view wx:elif="{{item.role === 'user'}}" class="msg me">
+        <view wx:if="{{item.failed}}" class="fail" data-i="{{index}}" bindtap="retry">!</view>
+        <view class="bubble bubble-me"><text user-select>{{item.content}}</text></view>
+      </view>
+
+      <view wx:else class="msg vera">
+        <image class="avatar" src="/images/vera.webp" webp mode="aspectFill" />
+        <view class="bubble bubble-vera">
+          <text wx:if="{{item.content}}" user-select>{{item.content}}</text>
+          <view wx:else class="dots"><view /><view /><view /></view>
+        </view>
+      </view>
+    </block>
+    <view id="end" class="end" />
+  </scroll-view>
+
+  <view class="composer">
+    <textarea class="input" value="{{input}}" bindinput="onInput" auto-height maxlength="12000" cursor-spacing="16"
+      show-confirm-bar="{{false}}" placeholder="{{s.placeholder}}" confirm-type="send" bindconfirm="send" />
+    <button class="send btn-primary" size="mini" disabled="{{sending || !input}}" bindtap="send">{{s.send}}</button>
+  </view>
+</view>

@@ -28,6 +28,7 @@ import (
 	"github.com/damonleelcx/Law-Med-agent/internal/llm"
 	"github.com/damonleelcx/Law-Med-agent/internal/mail"
 	"github.com/damonleelcx/Law-Med-agent/internal/web"
+	"github.com/damonleelcx/Law-Med-agent/internal/wechat"
 )
 
 func main() {
@@ -116,6 +117,16 @@ func run(mode string) error {
 		ag := &agent.Agent{Store: store, Model: model, LLM: cfg.LLMModel, FastLLM: cfg.LLMFastModel, Mailer: mailer, OnCallEmail: onCall}
 		api := &httpapi.Server{Pool: pool, Auth: authSvc, Store: store, Agent: ag, Static: web.FS(), CookieSecure: cfg.CookieSecure,
 			MailEnabled: mailer.Enabled(), Hub: hub}
+		wxc := wechat.Config{AppID: cfg.WXAppID, AppSecret: cfg.WXAppSecret, OfferID: cfg.WXOfferID, AppKey: cfg.WXPayAppKey, Env: cfg.WXPayEnv}
+		if wxc.Enabled() {
+			api.WX = wechat.New(wxc)
+			if wxc.PayEnabled() {
+				api.Stamps = &wechat.Stamps{Pool: pool, WX: api.WX}
+				slog.Info("wechat: sign-in and stamps on", "env", wxc.Env)
+			} else {
+				slog.Warn("WECHAT_STAMPS_DISABLED: sign-in is on but virtual payment is not configured; WeChat messages are free")
+			}
+		}
 		srv = &http.Server{Addr: cfg.Addr, Handler: api.Handler(), ReadHeaderTimeout: 10 * time.Second}
 		start(func() {
 			slog.Info("listening", "addr", cfg.Addr, "mode", mode)

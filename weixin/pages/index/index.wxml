@@ -1,0 +1,21 @@
+<view class="top">
+  <view wx:if="{{stampsEnabled && balance !== null}}" class="chip" bindtap="stamps">✉ {{balance}} · {{s.perMessage}}</view>
+  <view class="new" bindtap="create">＋ {{s.newChat}}</view>
+</view>
+
+<view wx:if="{{!loading && !list.length}}" class="empty muted">{{s.empty}}</view>
+
+<view class="list">
+  <view wx:for="{{list}}" wx:key="id" class="row" hover-class="row-hover" data-id="{{item.id}}" bindtap="open">
+    <image class="avatar" src="/images/vera.webp" webp mode="aspectFill" />
+    <view class="body">
+      <view class="line1">
+        <text class="title">{{item.title}}</text>
+        <text class="when muted">{{item.when}}</text>
+      </view>
+      <text class="last muted">{{item.last}}</text>
+    </view>
+  </view>
+</view>
+
+<view class="foot muted">{{s.disclaimer}}</view>

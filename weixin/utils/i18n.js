@@ -1,0 +1,58 @@
+const { lang } = require('./api')
+
+const S = {
+  en: {
+    chats: 'Chats',
+    stamps: 'Stamps',
+    newChat: 'New chat',
+    empty: 'No conversations yet. Start one with Vera.',
+    untitled: 'New conversation',
+    placeholder: 'Message Vera…',
+    send: 'Send',
+    perMessage: '1 stamp per message',
+    balance: 'Stamps',
+    outTitle: 'Out of stamps',
+    outBody: 'Each message costs 1 stamp. Buy more to keep talking with Vera.',
+    buyMore: 'Buy stamps',
+    later: 'Later',
+    buy: 'Buy',
+    packs: 'Stamp packs',
+    history: 'Recent use',
+    charged: 'Message',
+    refunded: 'Refunded',
+    bought: 'Stamps added',
+    payFailed: 'Payment was not completed',
+    payOff: 'Stamps are not enabled on this server — messages are free.',
+    error: 'Something went wrong',
+    disclaimer: 'Vera is an AI, not a lawyer or a doctor. Licensed professionals sign off on anything that needs a licence.',
+  },
+  zh: {
+    chats: '对话',
+    stamps: '邮票',
+    newChat: '新对话',
+    empty: '还没有对话，和维拉聊聊吧。',
+    untitled: '新对话',
+    placeholder: '给维拉发消息…',
+    send: '发送',
+    perMessage: '每条消息 1 张邮票',
+    balance: '邮票',
+    outTitle: '邮票用完了',
+    outBody: '每发送一条消息消耗 1 张邮票。购买邮票后可继续和维拉对话。',
+    buyMore: '购买邮票',
+    later: '稍后',
+    buy: '购买',
+    packs: '邮票套餐',
+    history: '最近使用',
+    charged: '发送消息',
+    refunded: '已退回',
+    bought: '邮票已到账',
+    payFailed: '支付未完成',
+    payOff: '本服务器未开启邮票，消息免费。',
+    error: '出错了',
+    disclaimer: '维拉是 AI，不是律师或医生。需要执照的事项由持证专业人士签字确认。',
+  },
+}
+
+module.exports = function t() {
+  return S[lang()] || S.en
+}

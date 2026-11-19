@@ -36,6 +36,7 @@ spec:
             - configMapRef: { name: act-config }
             - secretRef: { name: act }
             - secretRef: { name: act-mail, optional: true }
+            - secretRef: { name: act-wechat, optional: true }
           env:
             - { name: ACT_WORKERS, value: "0" }
           startupProbe:
@@ -90,6 +91,7 @@ spec:
             - configMapRef: { name: act-config }
             - secretRef: { name: act }
             - secretRef: { name: act-mail, optional: true }
+            - secretRef: { name: act-wechat, optional: true }
           resources:
             requests: { cpu: 50m, memory: 64Mi }
             limits: { cpu: "1", memory: 384Mi }

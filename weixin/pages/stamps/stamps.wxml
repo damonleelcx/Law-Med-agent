@@ -1,0 +1,27 @@
+<view wx:if="{{!loading && !enabled}}" class="off muted">{{s.payOff}}</view>
+
+<block wx:if="{{enabled}}">
+  <view class="card">
+    <view class="label">{{s.balance}}</view>
+    <view class="balance"><text class="glyph">✉</text>{{balance}}</view>
+    <view class="chip">{{s.perMessage}}</view>
+  </view>
+
+  <view class="section muted">{{s.packs}}</view>
+  <view class="packs">
+    <view wx:for="{{packs}}" wx:key="*this" class="pack {{buying ? 'busy' : ''}}" hover-class="pack-hover"
+      data-qty="{{item}}" bindtap="buy">
+      <view class="qty">✉ {{item}}</view>
+      <view class="cta">{{s.buy}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{ledger.length}}" class="section muted">{{s.history}}</view>
+  <view class="ledger">
+    <view wx:for="{{ledger}}" wx:key="key" class="entry">
+      <text>{{item.refunded ? s.refunded : s.charged}}</text>
+      <text class="muted when">{{item.when}}</text>
+      <text class="amt {{item.refunded ? 'plus' : ''}}">{{item.refunded ? '+' : '−'}}{{item.amount}}</text>
+    </view>
+  </view>
+</block>

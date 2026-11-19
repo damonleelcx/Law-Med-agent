@@ -400,11 +400,19 @@ func (s *Server) postMessage(w http.ResponseWriter, r *http.Request, u *auth.Use
 		writeErr(w, 500, "streaming unsupported")
 		return
 	}
+	// WeChat accounts pay 1 stamp per message, before any model work.
+	charge, ok := s.chargeMessage(w, r, u, convID, in.ClientMsgID)
+	if !ok {
+		return
+	}
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.WriteHeader(200)
 	sink := &sseSink{w: w, fl: fl}
+	if charge != nil {
+		sink.send("stamps", charge)
+	}
 	au := agent.User{ID: u.ID, Email: u.Email, Name: u.Name, Lang: s.lang(r, u)}
 	// The turn is not tied to the request: if the browser disconnects mid-
 	// stream, the reply is still produced and saved, and appears on refresh.
@@ -413,6 +421,14 @@ func (s *Server) postMessage(w http.ResponseWriter, r *http.Request, u *auth.Use
 	id, err := s.Agent.Turn(ctx, au, convID, strings.TrimSpace(in.Content), in.ClientMsgID, sink)
 	if err != nil {
 		slog.Error("turn", "err", err)
+		// No answer, no charge: give the stamp back.
+		if charge != nil && s.Stamps != nil {
+			if rerr := s.Stamps.Refund(ctx, u.ID, charge, clientIP(r)); rerr != nil {
+				slog.Error("stamp refund", "order", charge.OrderID, "err", rerr)
+			} else {
+				sink.send("stamps", map[string]any{"refunded": charge.Amount, "order_id": charge.OrderID})
+			}
+		}
 		sink.send("error", map[string]string{"error": "something went wrong; your message is saved"})
 		return
 	}

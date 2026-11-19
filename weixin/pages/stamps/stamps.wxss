@@ -1,0 +1,82 @@
+.card {
+  margin: 32rpx;
+  padding: 48rpx 32rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #07c160, #06ad56);
+  color: #fff;
+  text-align: center;
+}
+.card .chip {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+.label {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+.balance {
+  font-size: 96rpx;
+  font-weight: 600;
+  margin: 12rpx 0 20rpx;
+}
+.glyph {
+  font-size: 56rpx;
+  margin-right: 12rpx;
+}
+.section {
+  font-size: 26rpx;
+  padding: 16rpx 40rpx;
+}
+.packs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  padding: 0 32rpx;
+}
+.pack {
+  background: var(--cell);
+  border-radius: 16rpx;
+  padding: 32rpx 0;
+  text-align: center;
+}
+.pack-hover {
+  background: #f2f2f2;
+}
+.busy {
+  opacity: 0.5;
+}
+.qty {
+  font-size: 40rpx;
+  font-weight: 600;
+}
+.cta {
+  margin-top: 12rpx;
+  color: var(--green);
+  font-size: 28rpx;
+}
+.ledger {
+  background: var(--cell);
+  margin-bottom: 48rpx;
+}
+.entry {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 40rpx;
+  border-bottom: 1rpx solid var(--line);
+  font-size: 28rpx;
+}
+.when {
+  margin-left: 20rpx;
+  font-size: 24rpx;
+}
+.amt {
+  margin-left: auto;
+  font-weight: 600;
+}
+.plus {
+  color: var(--green);
+}
+.off {
+  text-align: center;
+  padding: 120rpx 48rpx;
+}

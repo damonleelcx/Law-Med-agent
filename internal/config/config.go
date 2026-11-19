@@ -42,6 +42,15 @@ type Config struct {
 
 	// CourtListenerToken is optional; the anonymous API is rate limited but works.
 	CourtListenerToken string
+
+	// WeChat mini program. AppID + AppSecret turn on WeChat sign-in; OfferID
+	// + PayAppKey turn on virtual payment, and with it 1 stamp per message
+	// for WeChat accounts. PayEnv 0 is production, 1 the sandbox.
+	WXAppID     string
+	WXAppSecret string
+	WXOfferID   string
+	WXPayAppKey string
+	WXPayEnv    int
 }
 
 func Load() (Config, error) {
@@ -66,6 +75,11 @@ func Load() (Config, error) {
 		AccountDailyTokens:    envInt("ACT_ACCOUNT_DAILY_TOKENS", 1_500_000),
 		DeploymentDailyTokens: envInt("ACT_DEPLOYMENT_DAILY_TOKENS", 40_000_000),
 		CourtListenerToken:    os.Getenv("ACT_COURTLISTENER_TOKEN"),
+		WXAppID:               os.Getenv("ACT_WX_APPID"),
+		WXAppSecret:           os.Getenv("ACT_WX_APPSECRET"),
+		WXOfferID:             os.Getenv("ACT_WX_OFFER_ID"),
+		WXPayAppKey:           os.Getenv("ACT_WX_PAY_APPKEY"),
+		WXPayEnv:              envInt("ACT_WX_PAY_ENV", 0),
 	}
 	for _, e := range strings.Split(os.Getenv("ACT_ADMIN_EMAILS"), ",") {
 		if e = strings.ToLower(strings.TrimSpace(e)); e != "" {

@@ -1,0 +1,141 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.bar {
+  padding: 12rpx 24rpx;
+  text-align: center;
+}
+.log {
+  flex: 1;
+  min-height: 0;
+  padding: 16rpx 0;
+}
+.msg {
+  display: flex;
+  align-items: flex-start;
+  padding: 16rpx 24rpx;
+}
+.me {
+  justify-content: flex-end;
+  align-items: center;
+}
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 10rpx;
+  flex: none;
+  margin-right: 20rpx;
+  background: #dfe8e6;
+}
+.bubble {
+  max-width: 72%;
+  padding: 18rpx 24rpx;
+  border-radius: 10rpx;
+  line-height: 1.55;
+  font-size: 31rpx;
+  word-break: break-word;
+  white-space: pre-wrap;
+  position: relative;
+}
+.bubble-me {
+  background: var(--bubble-me);
+}
+.bubble-vera {
+  background: var(--bubble-vera);
+}
+/* The little tails WeChat bubbles have. */
+.bubble-me::after,
+.bubble-vera::before {
+  content: '';
+  position: absolute;
+  top: 26rpx;
+  border: 10rpx solid transparent;
+}
+.bubble-me::after {
+  right: -18rpx;
+  border-left-color: var(--bubble-me);
+}
+.bubble-vera::before {
+  left: -18rpx;
+  border-right-color: var(--bubble-vera);
+}
+.fail {
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-right: 16rpx;
+}
+.sys {
+  text-align: center;
+  padding: 12rpx 64rpx;
+}
+.sys text {
+  display: inline-block;
+  font-size: 24rpx;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+}
+.dots {
+  display: flex;
+  gap: 10rpx;
+  padding: 10rpx 4rpx;
+}
+.dots view {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #b2b2b2;
+  animation: blink 1.2s infinite both;
+}
+.dots view:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dots view:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+.end {
+  height: 8rpx;
+}
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 16rpx;
+  padding: 16rpx 20rpx;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #f7f7f7;
+  border-top: 1rpx solid var(--line);
+}
+.input {
+  flex: 1;
+  min-height: 40rpx;
+  max-height: 240rpx;
+  background: #fff;
+  border-radius: 8rpx;
+  padding: 16rpx 20rpx;
+  font-size: 31rpx;
+}
+.send {
+  flex: none;
+  margin: 0 !important;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 28rpx !important;
+}
+.send[disabled] {
+  background: #c6e8d4 !important;
+  color: #fff !important;
+}

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/chat/chat",
+    "pages/stamps/stamps"
+  ],
+  "window": {
+    "navigationBarTitleText": "维拉 Vera",
+    "navigationBarBackgroundColor": "#EDEDED",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#EDEDED",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#7F7F7F",
+    "selectedColor": "#07C160",
+    "backgroundColor": "#F7F7F7",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "Chats" },
+      { "pagePath": "pages/stamps/stamps", "text": "Stamps" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
