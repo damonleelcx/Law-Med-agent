@@ -6,7 +6,7 @@ import {
   IconArrow, IconArrowL, IconArrowUR, IconBell, IconBriefcase, IconCalendar, IconCar, IconDoc, IconFlask, IconFolder,
   IconHeart, IconLock, IconPill, IconScale, IconShield, IconSpark, IconUser, LogoMark,
 } from '../components/Icons'
-import { useI18n } from '../lib/i18n'
+import { icp, icpLicence, useI18n } from '../lib/i18n'
 import { useSession } from '../lib/session'
 import '../styles/landing.css'
 
@@ -316,7 +316,7 @@ export default function Landing() {
             <a href="mailto:support@heros-agent.space">{t.footer.links[2]}</a>
           </nav>
           <div className="f-bottom">
-            <span>{t.footer.rights}</span>
+            <span>{t.footer.rights}{icp && <> · <a className="f-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{icp}</a></>}{icpLicence && <> · <span className="f-icp">增值电信业务经营许可证：{icpLicence}</span></>}</span>
             <LangSwitch />
           </div>
         </footer>

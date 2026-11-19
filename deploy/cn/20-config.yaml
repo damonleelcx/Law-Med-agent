@@ -1,0 +1,42 @@
+# The mainland China copy: Alibaba Cloud ECS (Hangzhou), vera.zhiyuwujie.top.
+# Same knobs as deploy/k8s/20-config.yaml, minus what can't run from China (the
+# US mail relay, Google Fonts). Secrets are created on the node by
+# deploy/cn/secrets.sh and never appear here.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: act-config
+  namespace: act
+data:
+  ACT_ADDR: ":8080"
+  ACT_PUBLIC_ORIGIN: "https://vera.zhiyuwujie.top"
+  ACT_COOKIE_SECURE: "true"
+  # Opens in Chinese, no Google Fonts, ICP number in the footer.
+  ACT_REGION: "cn"
+  # Shown in the home page and legal page footers, as mainland rules require;
+  # the same as suki.zhiyuwujie.top. Add the domain's filing number
+  # (苏ICP备…号-N) to ACT_ICP_BEIAN once known: it links to beian.miit.gov.cn.
+  ACT_ICP_LICENCE: "苏B2-20262623"
+  ACT_ICP_BEIAN: ""
+
+  # Qwen on Alibaba Cloud Model Studio (Beijing): reachable from the node. The key
+  # is ACT_LLM_API_KEY in the act secret.
+  ACT_LLM_BASE_URL: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+  ACT_LLM_MODEL: "qwen3.8-max"
+  ACT_LLM_FAST_MODEL: "qwen3.8-flash"
+
+  # Mail: Alibaba Cloud DirectMail (邮件推送) over STARTTLS on port 80 (ECS
+  # blocks outbound 25). The login is in the optional act-mail secret; without
+  # it, sign-up links are logged instead of sent (MAIL_DISABLED).
+  ACT_SMTP_HOST: "smtpdm.aliyun.com"
+  ACT_SMTP_PORT: "80"
+
+  # WeChat mini program: 0 production, 1 sandbox. Keys are in the optional
+  # act-wechat secret.
+  ACT_WX_PAY_ENV: "0"
+
+  ACT_WORKERS: "2"
+  ACT_LEASE: "90s"
+  ACT_ACCOUNT_DAILY_TOKENS: "1500000"
+  ACT_DEPLOYMENT_DAILY_TOKENS: "20000000"
+  GOMEMLIMIT: "300MiB"

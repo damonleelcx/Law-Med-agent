@@ -3,8 +3,10 @@
 //
 // Inside WeChat DevTools' simulator the app talks to a server on this machine
 // instead (scripts/wx-dev.ps1 starts one). Real phones, including preview and
-// trial builds, always use production.
-const PROD = 'https://act.heros-agent.space'
+// trial builds, always use production: the mainland China copy on Alibaba
+// Cloud (deploy/cn). A mini program can only call ICP-filed domains, which the
+// US copy (act.heros-agent.space) is not.
+const PROD = 'https://vera.zhiyuwujie.top'
 const LOCAL = 'http://127.0.0.1:8080'
 
 function inDevTools() {

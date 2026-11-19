@@ -27,6 +27,7 @@ import (
 	"github.com/damonleelcx/Law-Med-agent/internal/httpapi"
 	"github.com/damonleelcx/Law-Med-agent/internal/llm"
 	"github.com/damonleelcx/Law-Med-agent/internal/mail"
+	"github.com/damonleelcx/Law-Med-agent/internal/tools"
 	"github.com/damonleelcx/Law-Med-agent/internal/web"
 	"github.com/damonleelcx/Law-Med-agent/internal/wechat"
 )
@@ -84,6 +85,11 @@ func run(mode string) error {
 	if cfg.LLMAPIKey == "" {
 		slog.Warn("MODEL_DISABLED: ACT_LLM_API_KEY is empty; chat and background work will fail until it is set")
 	}
+	// The mainland copy sends nothing to services outside mainland China.
+	if cfg.China() {
+		tools.MainlandOnly = true
+		slog.Info("region cn: tool lookups outside mainland China are disabled")
+	}
 	client := llm.New(cfg.LLMBaseURL, cfg.LLMAPIKey)
 	// A failing primary falls back to the fast model rather than stopping.
 	client.Fallback = map[string]string{cfg.LLMModel: cfg.LLMFastModel}
@@ -116,7 +122,7 @@ func run(mode string) error {
 		authSvc := &auth.Service{Pool: pool, Mailer: mailer, PublicOrigin: originOr(cfg.PublicOrigin, cfg.Addr), SessionTTL: cfg.SessionTTL, AdminEmails: cfg.AdminEmails}
 		ag := &agent.Agent{Store: store, Model: model, LLM: cfg.LLMModel, FastLLM: cfg.LLMFastModel, Mailer: mailer, OnCallEmail: onCall}
 		api := &httpapi.Server{Pool: pool, Auth: authSvc, Store: store, Agent: ag, Static: web.FS(), CookieSecure: cfg.CookieSecure,
-			MailEnabled: mailer.Enabled(), Hub: hub}
+			MailEnabled: mailer.Enabled(), Hub: hub, Region: cfg.Region, ICPBeian: cfg.ICPBeian, ICPLicence: cfg.ICPLicence}
 		wxc := wechat.Config{AppID: cfg.WXAppID, AppSecret: cfg.WXAppSecret, OfferID: cfg.WXOfferID, AppKey: cfg.WXPayAppKey, Env: cfg.WXPayEnv}
 		if wxc.Enabled() {
 			api.WX = wechat.New(wxc)

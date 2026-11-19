@@ -306,3 +306,5 @@ section[id] { scroll-margin-top: 76px; }
   .tabs { width: 100%; }
   .tabs button { flex: 1; padding: 10px 8px; font-size: 13px; line-height: 1.25; }
 }
+.f-icp { color: inherit; text-decoration: none; }
+.f-icp:hover { text-decoration: underline; }
