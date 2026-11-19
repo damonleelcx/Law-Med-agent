@@ -1,0 +1,13 @@
+{
+  "name": "act-wx-e2e",
+  "private": true,
+  "description": "UI tests for the Vera WeChat mini program, driven through WeChat DevTools",
+  "scripts": {
+    "devmock": "node devmock.js",
+    "real-model": "node real-model.js",
+    "reset": "node reset.js"
+  },
+  "dependencies": {
+    "miniprogram-automator": "0.12.1"
+  }
+}

@@ -8,3 +8,5 @@ internal/web/dist/*
 deploy/deploy.env
 *.test
 weixin/project.private.config.json
+scripts/wx-e2e/node_modules/
+scripts/wx-e2e/shots/

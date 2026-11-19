@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,6 +18,7 @@ import (
 	"github.com/damonleelcx/Law-Med-agent/internal/engine"
 	"github.com/damonleelcx/Law-Med-agent/internal/persona"
 	"github.com/damonleelcx/Law-Med-agent/internal/tools"
+	"github.com/damonleelcx/Law-Med-agent/internal/wechat"
 )
 
 // ── settings ───────────────────────────────────────────────────────────────
@@ -420,20 +422,33 @@ func (s *Server) postMessage(w http.ResponseWriter, r *http.Request, u *auth.Use
 	ctx, cancel := contextDetached(r, 3*time.Minute)
 	defer cancel()
 	id, err := s.Agent.Turn(ctx, au, convID, strings.TrimSpace(in.Content), in.ClientMsgID, sink)
+	if errors.Is(err, agent.ErrUnanswered) {
+		// Vera's fallback ("can't reach my reasoning service") was shown and
+		// saved, but it is not an answer: no answer, no charge.
+		s.refundTurn(ctx, r, u, charge, sink)
+		sink.send("done", map[string]int64{"id": id})
+		return
+	}
 	if err != nil {
 		slog.Error("turn", "err", err)
-		// No answer, no charge: give the stamp back.
-		if charge != nil && s.Stamps != nil {
-			if rerr := s.Stamps.Refund(ctx, u.ID, charge, clientIP(r)); rerr != nil {
-				slog.Error("stamp refund", "order", charge.OrderID, "err", rerr)
-			} else {
-				sink.send("stamps", map[string]any{"refunded": charge.Amount, "order_id": charge.OrderID})
-			}
-		}
+		s.refundTurn(ctx, r, u, charge, sink)
 		sink.send("error", map[string]string{"error": "something went wrong; your message is saved"})
 		return
 	}
 	sink.send("done", map[string]int64{"id": id})
+}
+
+// refundTurn gives back the stamp a message paid for when the turn produced
+// no answer. Web accounts pay nothing, so there is nothing to refund.
+func (s *Server) refundTurn(ctx context.Context, r *http.Request, u *auth.User, charge *wechat.Charge, sink *sseSink) {
+	if charge == nil || s.Stamps == nil {
+		return
+	}
+	if err := s.Stamps.Refund(ctx, u.ID, charge, clientIP(r)); err != nil {
+		slog.Error("stamp refund", "order", charge.OrderID, "err", err)
+		return
+	}
+	sink.send("stamps", map[string]any{"refunded": charge.Amount, "order_id": charge.OrderID})
 }
 
 // ── goals ──────────────────────────────────────────────────────────────────

@@ -156,7 +156,9 @@ func chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	prompt := all.String()
-	if strings.Contains(prompt, "#fail") && req.Stream {
+	// Only the client's latest message decides: devmock's own replies mention
+	// #fail, and they come back in the history of every later turn.
+	if strings.Contains(last, "#fail") && req.Stream {
 		http.Error(w, `{"error":{"message":"devmock: failing on purpose"}}`, 400)
 		return
 	}
@@ -175,7 +177,6 @@ func chat(w http.ResponseWriter, r *http.Request) {
 	if zh {
 		reply = "这是 devmock 的**本地测试回复**，正式环境中维拉会在这里回答。\n\n- 这条消息消耗了 1 张邮票。\n- 发送 `#fail` 可以看到退回邮票。"
 	}
-	_ = last
 	w.Header().Set("Content-Type", "text/event-stream")
 	fl, _ := w.(http.Flusher)
 	for _, part := range chunks(reply, 6) {

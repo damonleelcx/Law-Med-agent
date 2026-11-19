@@ -81,8 +81,16 @@ type User struct {
 	Lang            string
 }
 
+// ErrUnanswered: the turn saved a reply, but it is only the "I can't reach my
+// reasoning service" / "usage limit" fallback, not an answer. The caller
+// still gets the reply's id; a paid message is refunded ("no answer, no
+// charge").
+var ErrUnanswered = errors.New("turn saved a fallback reply, not an answer")
+
 // Turn handles one user message end to end. Idempotent on clientMsgID: a
-// retried POST returns the reply that was already produced.
+// retried POST returns the reply that was already produced. When the model
+// could not answer, the fallback reply is saved and returned together with
+// ErrUnanswered.
 func (a *Agent) Turn(ctx context.Context, u User, convID, text, clientMsgID string, sink Sink) (int64, error) {
 	// The language the client CHOSE wins. Guessing from the message is only a
 	// fallback for an account with no preference: a Chinese-speaking client
@@ -219,6 +227,9 @@ func (a *Agent) Turn(ctx context.Context, u User, convID, text, clientMsgID stri
 		return 0, err
 	}
 	go a.afterTurn(context.WithoutCancel(ctx), u, convID, text, route)
+	if meta["error"] == true {
+		return replyID, ErrUnanswered
+	}
 	return replyID, nil
 }
 
